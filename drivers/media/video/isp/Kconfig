@@ -1,0 +1,19 @@
+# Kconfig for OMAP3 ISP driver
+
+config VIDEO_OMAP34XX_ISP_PREVIEWER
+	tristate "OMAP ISP Previewer"
+	depends on !ARCH_OMAP3410 && VIDEO_OMAP3
+
+config VIDEO_OMAP34XX_ISP_RESIZER
+	tristate "OMAP ISP Resizer"
+	depends on !ARCH_OMAP3410 && VIDEO_OMAP3
+
+config VIDEO_OMAP34XX_OV7675_ISP_GLUE
+	tristate "OMAP3 ISP <-> OV7675 (A32 CAM) Glue"
+	select VIDEO_OMAP3
+	select VIDEO_OV7675
+
+config VIDEO_OMAP34XX_MT9D113_ISP_GLUE
+	tristate "OMAP3 ISP <-> MT9D113 (A43 CAM) Glue"
+	select VIDEO_OMAP3
+	select VIDEO_MT9D113
