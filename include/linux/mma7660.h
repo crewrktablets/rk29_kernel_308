@@ -61,6 +61,7 @@
 #define MMA7660_BOUNDARY        (0x1 << (MMA7660_PRECISION - 1))
 #define MMA7660_TOTAL_TIME      10
 
+#if 0 /* Astralix: Moved to board.h */
 struct mma7660_platform_data {
 	int reset;
 	int clk_on;
@@ -76,6 +77,7 @@ struct mma7660_data {
 	struct work_struct work;
 	struct delayed_work delaywork;	/*report second event*/
 };
+#endif
 
 struct mma7660_axis {
 	int x;

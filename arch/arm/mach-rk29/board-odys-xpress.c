@@ -99,35 +99,12 @@
  * front is OV2655 at bus 1 address 0x60.
  *
  */
+#define CM9_KERNEL
 
 #ifdef CONFIG_VIDEO_RK29
 
 /*---------------- Camera Sensor Macro Define Begin  ------------------------*/
 /*---------------- Camera Sensor Configuration Macro Begin ------------------------*/
-
-#ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
-	#define CONFIG_SENSOR_0						 RK29_CAM_SENSOR_OV2655
-	#define CONFIG_SENSOR_IIC_ADDR_0       		 0x60
-	#define CONFIG_SENSOR_ORIENTATION_0       	 270
-	#define CONFIG_SENSOR_IIC_ADAPTER_ID_0    	 1
-	#define CONFIG_SENSOR_POWER_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_RESET_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_POWERDN_PIN_0       	 RK29_PIN6_PB7
-	#define CONFIG_SENSOR_FALSH_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_0 	 RK29_CAM_POWERACTIVE_L
-	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_0 	 RK29_CAM_RESETACTIVE_L
-	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0 RK29_CAM_POWERDNACTIVE_H
-	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0 	 RK29_CAM_FLASHACTIVE_L
-
-	#define CONFIG_SENSOR_QCIF_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_QVGA_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_CIF_FPS_FIXED_0       15000
-	#define CONFIG_SENSOR_VGA_FPS_FIXED_0       15000
-	#define CONFIG_SENSOR_480P_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_SVGA_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_720P_FPS_FIXED_0      30000
-#endif
-
 #ifdef CONFIG_SOC_CAMERA_OV7675				/* front camera sensor */
 	#define CONFIG_SENSOR_1 					 RK29_CAM_SENSOR_OV7675
 	#define CONFIG_SENSOR_IIC_ADDR_1       		 0x42
@@ -150,6 +127,29 @@
 	#define CONFIG_SENSOR_SVGA_FPS_FIXED_1          0
 	#define CONFIG_SENSOR_720P_FPS_FIXED_1          0
 #endif
+
+#ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
+	#define CONFIG_SENSOR_0						 RK29_CAM_SENSOR_OV2655
+	#define CONFIG_SENSOR_IIC_ADDR_0       		 0x60
+	#define CONFIG_SENSOR_ORIENTATION_0       	 90
+	#define CONFIG_SENSOR_IIC_ADAPTER_ID_0    	 1
+	#define CONFIG_SENSOR_POWER_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_RESET_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERDN_PIN_0       	 RK29_PIN6_PB7
+	#define CONFIG_SENSOR_FALSH_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_0 	 RK29_CAM_POWERACTIVE_L
+	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_0 	 RK29_CAM_RESETACTIVE_L
+	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0 RK29_CAM_POWERDNACTIVE_H
+	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0 	 RK29_CAM_FLASHACTIVE_L
+
+	#define CONFIG_SENSOR_QCIF_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_QVGA_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_CIF_FPS_FIXED_0       15000
+	#define CONFIG_SENSOR_VGA_FPS_FIXED_0       15000
+	#define CONFIG_SENSOR_480P_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_SVGA_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_720P_FPS_FIXED_0      30000
+#endif
 /*---------------- Camera Sensor Configuration Macro End------------------------*/
 #include "../../../drivers/media/video/rk29_camera.c"
 /*---------------- Camera Sensor Macro Define End  ------------------------*/
@@ -169,15 +169,15 @@
 #define V_VD 600
 
 #if (H_VD == 1280)  && (V_VD == 800)
-#define PMEM_UI_SIZE        ((32+64)* SZ_1M)	/* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((32+64)* SZ_1M)
 #elif (H_VD == 1024) && (V_VD == 768)
-#define PMEM_UI_SIZE        ((26+48) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((26+48) * SZ_1M)
 #elif (H_VD == 1024) && (V_VD == 600)
-#define PMEM_UI_SIZE        (60 * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        (60 * SZ_1M)
 #elif (H_VD == 800) && (V_VD == 600)
-#define PMEM_UI_SIZE        ((16+32) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((16+32) * SZ_1M)
 #elif (H_VD == 800) && (V_VD == 480)
-#define PMEM_UI_SIZE        ((12+32) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((12+32) * SZ_1M)
 #else
 #error "not support lcd"
 #endif
@@ -667,6 +667,7 @@ static struct platform_device rk29_v4l2_output_devce = {
 
 /*MMA8452 gsensor*/
 #if defined (CONFIG_GS_MMA8452)
+
 #define MMA8452_INT_PIN   RK29_PIN0_PA3
 
 static int mma8452_init_platform_hw(void)
@@ -681,17 +682,16 @@ static int mma8452_init_platform_hw(void)
     return 0;
 }
 
-
 static struct mma8452_platform_data mma8452_info = {
   .model= 8452,
   //.swap_xy = 0,
   .swap_xyz = 1,
-  .init_platform_hw= mma8452_init_platform_hw,
-//  .orientation = { -1, 0, 0, 0, 0, 1, 0, 1, 0},
-  /* Orientation for CM9 / ICS */
+  .init_platform_hw = mma8452_init_platform_hw,
+  #ifdef CM9_KERNEL
   .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
-  /* Orientation for CM10 / JB */
-  // .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
+  #else
+  .orientation = { 1, 0, 0,  0,-1, 0,  0, 0, 1},
+  #endif
 };
 #endif
 

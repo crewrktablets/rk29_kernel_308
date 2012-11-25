@@ -116,10 +116,10 @@ struct rk29fb_info{
 };
 
 struct rk29_bl_info{
-    u32 pwm_id;
-    u32 bl_ref;
-    int (*io_init)(void);
-    int (*io_deinit)(void);
+	u32 pwm_id;
+	u32 bl_ref;
+	int (*io_init)(void);
+	int (*io_deinit)(void);
 	int (*pwm_suspend)(void);
 	int (*pwm_resume)(void);
 	int min_brightness;	/* 0 ~ 255 */
@@ -128,11 +128,11 @@ struct rk29_bl_info{
 
 #ifndef _LINUX_WLAN_PLAT_H_
 struct wifi_platform_data {
-        int (*set_power)(int val);
-        int (*set_reset)(int val);
-        int (*set_carddetect)(int val);
-        void *(*mem_prealloc)(int section, unsigned long size);
-        int (*get_mac_addr)(unsigned char *buf);
+	int (*set_power)(int val);
+	int (*set_reset)(int val);
+	int (*set_carddetect)(int val);
+	void *(*mem_prealloc)(int section, unsigned long size);
+	int (*get_mac_addr)(unsigned char *buf);
 };
 #endif
 
@@ -146,8 +146,8 @@ struct rk29_sdmmc_platform_data {
 	void (*set_iomux)(int device_id, unsigned int bus_width);//added by xbw at 2011-10-13
 	int (*status)(struct device *);
 	int (*register_status_notify)(void (*callback)(int card_present, void *dev_id), void *dev_id);
-        int detect_irq;
-		int enable_sd_wakeup;
+	int detect_irq;
+	int enable_sd_wakeup;
 	int write_prt;
 };
 struct rk29_i2c_platform_data {
@@ -230,6 +230,8 @@ struct sis809_platform_data {
     int     (*platform_wakeup)(void);
     void    (*exit_platform_hw)(void);
 };
+
+
 struct eeti_egalax_platform_data{
 	u16     model;
 
@@ -243,6 +245,7 @@ struct eeti_egalax_platform_data{
     int     disp_on_pin;
     int     disp_on_value;
  };
+
 // added by Astralix, port from 2.6.36.27
 struct i2c_lz300_platform_data{
 	u16     model;
@@ -260,7 +263,6 @@ struct i2c_lz300_platform_data{
 	int 	screen_y[5];
 	int 	uncali_x_default[5];
 	int 	uncali_y_default[5];
- 
 };
 
 //added by zyw
@@ -294,6 +296,18 @@ struct synaptics_platform_data {
 	int 	(*sintek_platform_sleep)(void);
 	int 	(*sintek_platform_wakeup)(void);
 	void	(*exit_platform_hw)(void);
+};
+
+struct mma7660_platform_data {
+    u16     model;
+	u16     swap_xy;
+	u16		swap_xyz;
+	signed char orientation[9];
+    int     (*get_pendown_state)(void);
+    int     (*init_platform_hw)(void);
+    int     (*mma8452_platform_sleep)(void);
+    int     (*mma8452_platform_wakeup)(void);
+    void    (*exit_platform_hw)(void);
 };
 
 struct mma8452_platform_data {

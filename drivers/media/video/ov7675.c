@@ -56,7 +56,7 @@ module_param(debug, int, S_IRUGO|S_IWUSR);
 #define SENSOR_INIT_WINSEQADR		sensor_vga
 #define SENSOR_INIT_PIXFMT			V4L2_MBUS_FMT_YUYV8_2X8
 
-#define CONFIG_SENSOR_WhiteBalance	0
+#define CONFIG_SENSOR_WhiteBalance	1
 #define CONFIG_SENSOR_Brightness	0
 #define CONFIG_SENSOR_Contrast		0
 #define CONFIG_SENSOR_Saturation	0
@@ -101,7 +101,7 @@ module_param(debug, int, S_IRUGO|S_IWUSR);
  *
  */
 #ifndef OV7675_FLIP
-#define OV7675_FLIP		1
+#define OV7675_FLIP		0
 #endif
 
 /* Mirroring handled by sensor chip.
@@ -110,7 +110,7 @@ module_param(debug, int, S_IRUGO|S_IWUSR);
  *
  */
 #ifndef OV7675_MIRROR
-#define OV7675_MIRROR	0
+#define OV7675_MIRROR	1
 #endif
 
 struct reginfo
@@ -1116,14 +1116,14 @@ static int sensor_deactivate(struct i2c_client *client);
 
 static struct soc_camera_ops sensor_ops =
 {
-    .suspend                     = sensor_suspend,
-    .resume                       = sensor_resume,
+    .suspend			= sensor_suspend,
+    .resume				= sensor_resume,
     .set_bus_param		= sensor_set_bus_param,
     .query_bus_param	= sensor_query_bus_param,
-    .controls		= sensor_controls,
-    .menus                         = sensor_menus,
+    .controls			= sensor_controls,
+    .menus				= sensor_menus,
     .num_controls		= ARRAY_SIZE(sensor_controls),
-    .num_menus		= ARRAY_SIZE(sensor_menus),
+    .num_menus			= ARRAY_SIZE(sensor_menus),
 };
 
 /* only one fixed colorspace per pixelcode */
@@ -1241,13 +1241,13 @@ static int sensor_write(struct i2c_client *client, u8 reg, u8 val)
     msg->flags = client->flags;
     msg->buf = buf;
     msg->len = sizeof(buf);
-    msg->scl_rate = CONFIG_SENSOR_I2C_SPEED;                                        /* ddl@rock-chips.com : 100kHz */
-    msg->read_type = 0;               /* fpga i2c:0==I2C_NORMAL : direct use number not enum for don't want include spi_fpga.h */
+    msg->scl_rate = CONFIG_SENSOR_I2C_SPEED;	/* ddl@rock-chips.com : 100kHz */
+    msg->read_type = 0;				/* fpga i2c:0==I2C_NORMAL : direct use number not enum for don't want include spi_fpga.h */
 
     cnt = 3;
     err = -EAGAIN;
 
-    while ((cnt-- > 0) && (err < 0)) {                       /* ddl@rock-chips.com :  Transfer again if transent is failed   */
+    while ((cnt-- > 0) && (err < 0)) {			/* ddl@rock-chips.com :  Transfer again if transent is failed   */
         err = i2c_transfer(client->adapter, msg, 1);
 				udelay(50);
         if (err >= 0) {
@@ -1484,7 +1484,7 @@ static int sensor_init(struct v4l2_subdev *sd, u32 val)
 	if (qctrl)
         sensor->info_priv.digitalzoom = qctrl->default_value;
 
-    /* ddl@rock-chips.com : if sensor support auto focus and flash, programer must run focus and flash code  */
+    /* ddl@rock-chips.com : if sensor support auto focus and flash, programmer must run focus and flash code  */
 	#if CONFIG_SENSOR_Focus
     sensor_set_focus();
     qctrl = soc_camera_find_qctrl(&sensor_ops, V4L2_CID_FOCUS_ABSOLUTE);
