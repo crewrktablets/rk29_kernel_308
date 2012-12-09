@@ -52,108 +52,43 @@ module_param_named(dbg_level, rk29_battery_dbg_level, int, 0644);
 /*******************���²�������޸�******************************/
 #define	 TIMER_MS_COUNTS				50	/**< ADC sample period, base time for work queue. */
 //���²�����Ҫ���ʵ�ʲ��Ե���
-#define SLOPE_SECOND_COUNTS	            15	/**< Loop time for update of averaged ADC value. */
-#define DISCHARGE_MIN_SECOND	        70	//���ŵ��1%ʱ��
-#define CHARGE_MIN_SECOND	            45	//������1%ʱ��
-#define CHARGE_MID_SECOND	            90	//��ͨ����1%ʱ��
-#define CHARGE_MAX_SECOND	            250	//�����1%ʱ��
-#define CHARGE_FULL_DELAY_TIMES         10  //����������ʱ��
-#define USBCHARGE_IDENTIFY_TIMES        5   //����USB������pcʶ����ʱ��
-#define NUM_VOLTAGE_SAMPLE	            ((SLOPE_SECOND_COUNTS * 1000) / TIMER_MS_COUNTS)	//�洢�Ĳ�������
-#define NUM_DISCHARGE_MIN_SAMPLE	    ((DISCHARGE_MIN_SECOND * 1000) / TIMER_MS_COUNTS)	//�洢�Ĳ�������
-#define NUM_CHARGE_MIN_SAMPLE	        ((CHARGE_MIN_SECOND * 1000) / TIMER_MS_COUNTS)	    //�洢�Ĳ�������
-#define NUM_CHARGE_MID_SAMPLE	        ((CHARGE_MID_SECOND * 1000) / TIMER_MS_COUNTS)	    //�洢�Ĳ�������
-#define NUM_CHARGE_MAX_SAMPLE	        ((CHARGE_MAX_SECOND * 1000) / TIMER_MS_COUNTS)	    //�洢�Ĳ�������
-#define NUM_CHARGE_FULL_DELAY_TIMES     ((CHARGE_FULL_DELAY_TIMES * 1000) / TIMER_MS_COUNTS)	//�����״̬����ʱ�䳤��
-#define NUM_USBCHARGE_IDENTIFY_TIMES    ((USBCHARGE_IDENTIFY_TIMES * 1000) / TIMER_MS_COUNTS)	//�����״̬����ʱ�䳤��
+#define SLOPE_SECOND_COUNTS	            15	/**< Loop time for update of averaged voltage value. */
 
-#if 1 /* ---- ASTRALIX ---- */
-
-#define ADC_RESOLUTION			1024	/* 10-bit ADC type */
-#define BATT_MAX_VOL	0
-#define BATT_ZERO_VOL	1
-#define BATT_NORM_VOL	2
-#define BAT_ADC_TABLE_LEN	11
-
-#else /* ---- ASTRALIX ---- */
-
-#if defined(CONFIG_MACH_RK29_MEDIACOM) || defined (CONFIG_MACH_ODYS_XPRESS)
-/* 
- * Dual LiPo Battery Configuration 
+/* AX: Timeout value calculation per percent.
+ * Number of seconds the voltage has to be higher / lower than the last measured volt value before
+ * increasing (charge) or decreasing (discharge) the percent value by one.
  */
+/**< Seconds / percent while discharging */
+#define DISCHARGE_MIN_SECOND	        70
+/**< Seconds / percent while charging and voltage below [BATT_NORM_VOL_IDX] */
+#define CHARGE_MIN_SECOND	            45
+/**< Seconds / percent while charging and voltage below [BATT_MAX_VOL_IDX] */
+#define CHARGE_MID_SECOND	            90
+/**< Seconds / percent while charging and voltage above [BATT_MAX_VOL_IDX] */
+#define CHARGE_MAX_SECOND	           250
 
-/* ADC Setup */
+#define CHARGE_FULL_DELAY_TIMES        10  //����������ʱ��
+#define USBCHARGE_IDENTIFY_TIMES        5  //����USB������pcʶ����ʱ��
+
+/* AX: Number of samples taken for average voltage calculation */
+#define NUM_VOLTAGE_SAMPLE	            ((SLOPE_SECOND_COUNTS * 1000) / TIMER_MS_COUNTS)		// AX: 300
+
+/* AX: Convert seconds to 'ticks' counted in TIMER_MS_COUNTS */
+#define NUM_DISCHARGE_MIN_SAMPLE	    ((DISCHARGE_MIN_SECOND * 1000) / TIMER_MS_COUNTS)		// AX: 1400
+#define NUM_CHARGE_MIN_SAMPLE	        ((CHARGE_MIN_SECOND * 1000) / TIMER_MS_COUNTS)	    	// AX: 900
+#define NUM_CHARGE_MID_SAMPLE	        ((CHARGE_MID_SECOND * 1000) / TIMER_MS_COUNTS)	    	// AX: 1800
+#define NUM_CHARGE_MAX_SAMPLE	        ((CHARGE_MAX_SECOND * 1000) / TIMER_MS_COUNTS)	    	// AX: 5000
+#define NUM_CHARGE_FULL_DELAY_TIMES     ((CHARGE_FULL_DELAY_TIMES * 1000) / TIMER_MS_COUNTS)	// �����״̬����ʱ�䳤��
+#define NUM_USBCHARGE_IDENTIFY_TIMES    ((USBCHARGE_IDENTIFY_TIMES * 1000) / TIMER_MS_COUNTS)	// �����״̬����ʱ�䳤��
+
+/* AX: Modded this to be the indexes of the array now supplied by the board-*.c file */
 #define ADC_RESOLUTION			1024	/* 10-bit ADC type */
-#define BAT_REF_VALUE			2500	/* Voltage of internal reference 2.5V */
-#define BAT_PULL_UP_R			 300	/* ADC resistor network */
-#define BAT_PULL_DOWN_R			 100
+#define BATT_MAX_VOL_IDX		   0	/* Index of maxium battery voltage */
+#define BATT_ZERO_VOL_IDX		   1	/* Index of discharge cut-off voltage */
+#define BATT_NORM_VOL_IDX		   2	/* Index of standard voltage value */
 
-/* Battery setup */
-#define BATT_MAX_VOL_VALUE		8310	/* Maximum level equals 100% (8.140V) */
-#define BATT_ZERO_VOL_VALUE		6787	/* Minimum level equals 0% (6.787V) */
-#define BATT_NOMAL_VOL_VALUE		7450	/* No idea */
-
-#else /* defined(CONFIG_MACH_RK29_MEDIACOM) || defined (CONFIG_MACH_ODYS_XPRESS) */
-
-/* Single LiPo Batter Configuration */
-
-/* ADC Setup */
-#define ADC_RESOLUTION			(1 << 10)   /* 10-bit ADC type */
-#if defined(CONFIG_MACH_ODYS_LOOX_PLUS) || defined(CONFIG_MACH_ODYS_NEXT)
-#define BAT_REF_VALUE			2500	/* Voltage of internal reference 2.5V */
-#else
-#define BAT_REF_VALUE			3080    /* Voltage of internal reference 2.5V */
-#endif
-#define BAT_PULL_UP_R			 200	/* ADC resistor network */
-#define BAT_PULL_DOWN_R			 200
-
-/* Battery setup */
-#define BATT_MAX_VOL_VALUE		4165	/* Maximum level equals 100% (4.165V) */
-#define BATT_ZERO_VOL_VALUE		3450	/* Minimum level equals 0% (3.450V) */
-#define BATT_NOMAL_VOL_VALUE		3800	/* No idea */
-#endif
-
-
-/* Conversion table to convert mV to %
- * Two tables needed as values differ depending on charging
- * or discharging.
- */
-#define BAT_ADC_TABLE_LEN               11
-
-/* Discharging values */
-static int adc_raw_table_bat[BAT_ADC_TABLE_LEN] =
-{
-#if defined(CONFIG_MACH_RK29_ACH7)
-		3500, 3579, 3649, 3676, 3694, 3731, 3789, 3856, 3927, 4007, 4150
-#elif defined(CONFIG_MACH_RK29_ACH8)
-		3530, 3597, 3628, 3641, 3660, 3697, 3747, 3809, 3879, 3945, 4050
-#elif defined(CONFIG_MACH_RK29_MEDIACOM) || defined (CONFIG_MACH_ODYS_XPRESS)
-		/* 3490, 3597, 3628, 3641, 3660, 3697, 3747, 3809, 3879, 3945, 4165*/
-		6700, 6804, 6938, 7072, 7206, 7340, 7474, 7608, 7742, 7876, 8010
-#else
-		3450, 3597, 3628, 3641, 3660, 3697, 3747, 3809, 3879, 3945, 4165
-		//3490, 3579, 3649, 3676, 3694, 3731, 3789, 3856, 3927, 4007, 4160
-#endif
-};
-
-/* Charging values */
-static int adc_raw_table_ac[BAT_ADC_TABLE_LEN] =
-{
-#if defined(CONFIG_MACH_RK29_ACH7)
-		3691, 3760, 3800, 3827, 3845, 3885, 3950, 4007, 4078, 4158, 4300 //4185//4301
-#elif defined(CONFIG_MACH_RK29_ACH8)
-		3680, 3747, 3778, 3791, 3810, 3847, 3897, 3959, 4029, 4095, 4210 //4185//4301
-#elif defined(CONFIG_MACH_RK29_MEDIACOM) || defined (CONFIG_MACH_ODYS_XPRESS)
-		/*3600, 3760, 3800, 3827, 3845, 3885, 3950, 4007, 4078, 4140, 4200*/
-		/*7287, 7414, 7488, 7642, 7740, 7840, 7910, 8000, 8060, 8210, 8310*/
-		7127, 7287, 7414, 7488, 7642, 7740, 7840, 7910, 8000, 8060, 8210
-#else
-		// 3550, 3660, 3680, 3700, 3730, 3780, 3820, 3870, 3950, 4120, 4200
-		3600, 3760, 3800, 3827, 3845, 3885, 3950, 4007, 4078, 4140, 4200 //4185//4301
-#endif
-};
-#endif /* ---- ASTRALIX ---- */
-
+// TODO: move this to header file of battery */
+#define BAT_ADC_TABLE_LEN		  11	/* Voltage to percent conversion tables entries */
 
 extern int dwc_vbus_status(void);
 extern int get_msc_connect_flag(void);
@@ -206,9 +141,9 @@ enum
 
 typedef enum
 {
-	CHARGER_BATTERY = 0, /**< Battery discharging */
-	CHARGER_USB, /**< Not sure if charging or just supplied by USB */
-	CHARGER_AC /**< Battery charging, running on PSY */
+	CHARGER_BATTERY = 0,	/**< Battery discharging */
+	CHARGER_USB, 			/**< Not sure if charging or just supplied by USB */
+	CHARGER_AC				/**< Battery charging, running on PSY */
 } charger_type_t;
 
 /*****************************************************************
@@ -460,8 +395,8 @@ static void rk29_adc_battery_voltage_samples(struct rk29_adc_battery_data *bat)
 	bat->bat_voltageNow = ((value * pdata->adc_vref * (pdata->adc_rset_high + pdata->adc_rset_low)) / (ADC_RESOLUTION * pdata->adc_rset_low));
 
 	/* Limit battery voltage */
-	if (bat->bat_voltageNow >= pdata->adc_bat_levels[BATT_MAX_VOL] + 300)
-		bat->bat_voltageNow = pdata->adc_bat_levels[BATT_MAX_VOL] + 300;
+	if (bat->bat_voltageNow >= pdata->adc_bat_levels[BATT_MAX_VOL_IDX] + 300)
+		bat->bat_voltageNow = pdata->adc_bat_levels[BATT_MAX_VOL_IDX] + 300;
 
 	/* Add value to averaging ring buffer */
 	*pSamples++ = bat->bat_voltageNow;
@@ -756,6 +691,11 @@ static void rk29_adc_battery_timer_work(struct work_struct *work)
 
 }
 
+/** Setup work timer for sampling of battery voltage.
+ *
+ * This function sets up the worker timer to scan the battery
+ * ADC every TIMER_MS_COUNTS.
+ */
 static void rk29_adc_battery_scan_timer(unsigned long data)
 {
 	/* Schedule battery work queue every TIMER_MS_COUNTS */
@@ -895,13 +835,13 @@ static int rk29_adc_battery_get_status(struct rk29_adc_battery_data *bat)
 static int rk29_adc_battery_get_health(struct rk29_adc_battery_data *bat)
 {
 	struct rk29_adc_battery_platform_data *pdata = bat->pdata;
-	return (bat->bat_voltageNow < pdata->adc_bat_levels[BATT_ZERO_VOL]) ? POWER_SUPPLY_HEALTH_DEAD : POWER_SUPPLY_HEALTH_GOOD;
+	return (bat->bat_voltageNow < pdata->adc_bat_levels[BATT_ZERO_VOL_IDX]) ? POWER_SUPPLY_HEALTH_DEAD : POWER_SUPPLY_HEALTH_GOOD;
 }
 
 static int rk29_adc_battery_get_present(struct rk29_adc_battery_data *bat)
 {
 	struct rk29_adc_battery_platform_data *pdata = bat->pdata;
-	return (bat->bat_voltageNow > pdata->adc_bat_levels[BATT_ZERO_VOL]) ? 1 : 0;
+	return (bat->bat_voltageNow > pdata->adc_bat_levels[BATT_ZERO_VOL_IDX]) ? 1 : 0;
 }
 
 static int rk29_adc_battery_get_voltage_now(struct rk29_adc_battery_data *bat)
@@ -954,13 +894,13 @@ static int rk29_adc_battery_get_level(struct rk29_adc_battery_data *bat)
 static int rk29_adc_battery_get_max_design(struct rk29_adc_battery_data *bat)
 {
 	struct rk29_adc_battery_platform_data *pdata = bat->pdata;
-	return pdata->adc_bat_levels[BATT_MAX_VOL];
+	return pdata->adc_bat_levels[BATT_MAX_VOL_IDX];
 }
 
 static int rk29_adc_battery_get_min_design(struct rk29_adc_battery_data *bat)
 {
 	struct rk29_adc_battery_platform_data *pdata = bat->pdata;
-	return pdata->adc_bat_levels[BATT_ZERO_VOL];
+	return pdata->adc_bat_levels[BATT_ZERO_VOL_IDX];
 }
 
 static int rk29_adc_battery_get_property(struct power_supply *psy,
@@ -1238,9 +1178,9 @@ static void rk29_adc_battery_lowpower_check(struct rk29_adc_battery_data *bat)
 #endif
 
 	/* Immediate power off for battery protection */
-	if (bat->bat_voltageAvg <= (pdata->adc_bat_levels[BATT_ZERO_VOL] + 50))
+	if (bat->bat_voltageAvg <= (pdata->adc_bat_levels[BATT_ZERO_VOL_IDX] + 50))
 	{
-		printk("%umV -> low battery: powerdown (%u)\n", bat->bat_voltageAvg, pdata->adc_bat_levels[BATT_ZERO_VOL]+50);
+		printk("%umV -> low battery: powerdown (%u)\n", bat->bat_voltageAvg, pdata->adc_bat_levels[BATT_ZERO_VOL_IDX]+50);
 		system_state = SYSTEM_POWER_OFF;
 		pm_power_off();
 	}
