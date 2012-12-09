@@ -26,10 +26,6 @@ set -f
 LC_ALL=C
 export LC_ALL
 
-KBUILD_BUILD_VERSION=`svn info $0 | grep Revision | cut -d ' ' -f2`
-KBUILD_BUILD_USER="astralix"
-KBUILD_BUILD_HOST="mars"
-
 if [ -z "$KBUILD_BUILD_VERSION" ]; then
 	if [ -r .version ]; then
 		VERSION=`cat .version`

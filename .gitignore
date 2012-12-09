@@ -88,4 +88,5 @@ GTAGS
 /*.tgz
 /*.ppm
 /*.png
+*.log
 

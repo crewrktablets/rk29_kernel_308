@@ -1,0 +1,30 @@
+#!/bin/bash
+# build kernel for all devices
+
+. setenv
+
+DEVICES="xpress loox_plus next loox"
+MAKE_OPTIONS="-j2"
+KERNEL_PATH="../kernels"
+if [ "" == "$1" ]; then
+  rev=TEST
+else
+  rev="$1"
+fi
+
+make distclean
+# loop through each device
+for device in ${DEVICES} ; do
+  echo "***\n*** Building kernel for device: ${device} ***\n***\n"
+  # make mrproper
+  make odys_${device}_defconfig
+  make ${MAKE_OPTIONS} kernel.img modules 2>&1 | tee build.log
+  mkdir -p ${KERNEL_PATH}/${device}
+  cp kernel.img ${KERNEL_PATH}/${device}/
+  tar cjvf ${KERNEL_PATH}/kernel_308_${device}_${rev}.tar.bz2 kernel.img
+done
+# create package of all available modules
+MODULES=`find . -name '*.ko'`
+tar cjvf ${KERNEL_PATH}/modules_308_${rev}.tar.bz2 ${MODULES}
+
+

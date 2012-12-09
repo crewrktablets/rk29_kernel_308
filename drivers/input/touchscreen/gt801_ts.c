@@ -36,16 +36,38 @@
 	#define gt801printk(msg...)
 #endif
 
-#define SINGLTOUCH_MODE 0 
+/** Number of INIT registers */
 #define GT801_REGS_NUM 53
 
-#if SINGLTOUCH_MODE
-	#define TOUCH_NUMBER 1
-#else
-    #define TOUCH_NUMBER 2
-#endif
+/** Number of touch points */
+#define NUM_FINGERS  5
+/** number of registers per touch point */
+#define TOUCH_REG_NUM 5
 
-#define TOUCH_REG_NUM 5 //ÿ�������Ҫ�ļĴ�����Ŀ
+/**
+ * Register adress for each touch point measurement
+ */
+static const unsigned char touchRegMap[NUM_FINGERS][TOUCH_REG_NUM] =
+{ //  xh, xl, yh, yl, press
+#if NUM_FINGERS > 0
+    {  0,  1,  2,  3,  4  },
+#endif
+#if NUM_FINGERS > 1
+    {  5,  6,  7,  8,  9  },
+#endif
+#if NUM_FINGERS > 2
+    { 10, 11, 12, 13, 14  },
+#endif
+#if NUM_FINGERS > 3
+    { 15, 22, 23, 24, 25  },
+#endif
+#if NUM_FINGERS > 4
+    { 26, 27, 28, 29, 30  },
+#endif
+};
+
+/** Note: This assumes that address of pressure is always the highest address */
+#define TOUCH_RX_BUF_SIZE (touchRegMap[NUM_FINGERS-1][ptpressure]+1)
 
 const unsigned char GT801_RegData[GT801_REGS_NUM]=
 {
@@ -58,8 +80,8 @@ const unsigned char GT801_RegData[GT801_REGS_NUM]=
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x00,0x00,0x00,0x00,0x01
 #else
-    0x19,0x05,0x06,0x28,0x02,0x14,0x14,0x10,
-    0x40,0xB0,0x02,0x58,0x03,0x20,0x01,0x23,
+    0x19,0x02,0x07,0x28,0x02,0x14,0x14,0x10,
+    0x28,0xB0,0x02,0x58,0x03,0x20,0x01,0x23,
     0x45,0x67,0x89,0xab,0xcd,0xe1,0x00,0x00,
     0x35,0x2e,0x4d,0xc1,0x20,0x00,0xe3,0x80,
     0x50,0x3c,0x1e,0xb4,0x00,0x33,0x2c,0x01,
@@ -134,24 +156,19 @@ static int gt801_init_panel(struct gt801_ts_data *ts)
 
 static void gt801_ts_work_func(struct work_struct *work)
 {
-#if  SINGLTOUCH_MODE
-  
-#else
 	int  touchIdx = 0;
-#endif
 
 	unsigned char start_reg = 0x02;
-    unsigned char buf[TOUCH_NUMBER*TOUCH_REG_NUM];
+    unsigned char buf[TOUCH_RX_BUF_SIZE];
 	unsigned short x;
 	unsigned short y;
-    int i,ret;
-	int bufLen = TOUCH_NUMBER*TOUCH_REG_NUM;
+    int i, j, ret;
 
     struct gt801_ts_data *ts = container_of(work, struct gt801_ts_data, work);
 	
 	gt801printk("%s\n",__FUNCTION__);
     
-	ret=gt801_read_regs(ts->client, start_reg, buf,bufLen);
+	ret=gt801_read_regs(ts->client, start_reg, buf, TOUCH_RX_BUF_SIZE);
 	if (ret < 0) {
 	  	printk("%s:i2c_transfer fail =%d\n",__FUNCTION__,ret);
 		if (ts->use_irq) 
@@ -159,64 +176,36 @@ static void gt801_ts_work_func(struct work_struct *work)
 		
 		return;
     }
-	gt801printk("RAW[0]: %02x %02x %02x %02x %02x\n",buf[0], buf[1], buf[2], buf[3], buf[4]);
-    gt801printk("RAW[1]: %02x %02x %02x %02x %02x\n",buf[5], buf[6], buf[7], buf[8], buf[9]);
-	       
-#if  SINGLTOUCH_MODE 
-	i = 0;
-	if(buf[i+ptpressure] == 0)
+	/*
+	 * dump received data
+	 */
+	// loop through touch points
+	for(i=0; i<NUM_FINGERS; i++)
 	{
-		gt801printk(" realse ts_dev->point.x=%d ,ts_dev->point.y=%d \n",ts->point.x,ts->point.y);
-
-		if (touch_state[i] == TOUCH_DOWN)
-		{
-			input_report_key(ts->input_dev,BTN_TOUCH,0);
-			syn_flag = 1;
-			touch_state[i] = TOUCH_UP;
-			gt801printk("SINGLTOUCH_MODE up\n");
-		}
+      gt801printk("RAW[%d]: ",i);
+      // loop through touch point registers
+      for(j=0; j<TOUCH_REG_NUM; j++)
+      {
+        gt801printk("%02x ",buf[touchRegMap[i][j]]);
+      }
+      gt801printk("\n");
 	}
-	else
-	{
-		x = ((( ((unsigned short)buf[i+ptxh] )<< 8) ) | buf[i+ptxl]);
-		y= (((((unsigned short)buf[i+ptyh] )<< 8) )| buf[i+ptyl]);	
-		
-        // correct coordinates based on selected options
-        if (ts->options & GT801_OPT_SWAP_XY) swap(x, y);
-        if (ts->options & GT801_OPT_INV_X) x = ts->x_max - x;
-        if (ts->options & GT801_OPT_INV_Y) y = ts->y_max - y;
-		
-		if (verify_coord(ts,&x,&y))
-			goto out;
-		
-		if (touch_state[i] == TOUCH_UP)
-		{
-			gt801printk("SINGLTOUCH_MODE down\n");
-			input_report_key(ts->input_dev,BTN_TOUCH,1);
-			touch_state[i] = TOUCH_DOWN;
-		}
-		
-		gt801printk("input_report_abs(%d/%d)\n",x,y);
-		input_report_abs(ts->input_dev,ABS_X,x );
-		input_report_abs(ts->input_dev,ABS_Y,y );
-		syn_flag = 1;
-	}
-#else   
 
 	// calculate and report all reported touch events
-    for(touchIdx=0; touchIdx<TOUCH_NUMBER;touchIdx++)
+    for(touchIdx=0; touchIdx<NUM_FINGERS;touchIdx++)
 	{
-        i=touchIdx*TOUCH_REG_NUM;
         input_report_abs(ts->input_dev, ABS_MT_TRACKING_ID, touchIdx);
-		if(buf[i+ptpressure] == 0)
+		if(buf[touchRegMap[touchIdx][ptpressure]] == 0)
 		{
-			gt801printk("%s:buf=%d touch up\n",__FUNCTION__,buf[i+ptpressure]);
+			gt801printk("%s:-%d-:buf=%d touch up\n",__FUNCTION__,touchIdx,buf[touchRegMap[touchIdx][ptpressure]]);
 		}
 		else
 		{
             // get coordinates from buffer
-            x = (((((unsigned short)buf[i+ptxh] )<< 8) ) | buf[i+ptxl]);
-		    y = (((((unsigned short)buf[i+ptyh] )<< 8) )| buf[i+ptyl]);
+            x = (((((unsigned short)buf[touchRegMap[touchIdx][ptxh]] )<< 8) )
+                | buf[touchRegMap[touchIdx][ptxl]]);
+		    y = (((((unsigned short)buf[touchRegMap[touchIdx][ptyh]] )<< 8) )
+		        | buf[touchRegMap[touchIdx][ptyl]]);
 
 		    // correct coordinates based on selected options
 	        if (ts->options & GT801_OPT_SWAP_XY) swap(x, y);
@@ -224,14 +213,14 @@ static void gt801_ts_work_func(struct work_struct *work)
             if (ts->options & GT801_OPT_INV_Y) y = ts->y_max - y;
 
             // report coordinates
-	        gt801printk("input_report_abs--%d-%d-(%d/%d)\n", i,touchIdx, x, y);
+	        gt801printk("input_report_abs-%d-(%d/%d)\n",touchIdx, x, y);
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x);
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y);
             input_report_abs(ts->input_dev, ABS_MT_PRESSURE,   255);
 		}
         input_mt_sync(ts->input_dev);
     }
-#endif
+
     input_sync(ts->input_dev);
 
    	if (ts->use_irq) {
@@ -460,19 +449,6 @@ static int gt801_ts_probe(struct i2c_client *client, const struct i2c_device_id 
 	ts->input_dev->name = ts->name;
 	ts->input_dev->dev.parent = &client->dev;
 
-#if SINGLTOUCH_MODE
-	ts->input_dev->evbit[0] = BIT_MASK(EV_ABS)|BIT_MASK(EV_KEY);
-	ts->input_dev->keybit[BIT_WORD(BTN_TOUCH)] = BIT_MASK(BTN_TOUCH);
-	input_set_abs_params(ts->input_dev,ABS_X,
-		    ts->x_min ? : 0,
-			ts->x_max ? : 800,
-			0, 0);
-	input_set_abs_params(ts->input_dev,ABS_Y,
-			ts->y_min ? : 0,
-			ts->y_max ? : 600,
-			0, 0);
-
-#else
     ts->input_dev->evbit[0] = BIT_MASK(EV_SYN) | BIT_MASK(EV_ABS);
   //  ts->input_dev->absbit[0] = 
 	//	BIT(ABS_MT_POSITION_X) | BIT(ABS_MT_POSITION_Y) | 
@@ -496,9 +472,8 @@ static int gt801_ts_probe(struct i2c_client *client, const struct i2c_device_id 
     // input_set_abs_params(ts->input_dev, ABS_MT_TOUCH_MAJOR, 0, 1, 0, 0); //Finger Size
     // input_set_abs_params(ts->input_dev, ABS_MT_WIDTH_MAJOR, 0, 10, 0, 0); //Touch Size
     input_set_abs_params(ts->input_dev, ABS_MT_PRESSURE,   0, 255,   0, 0);
-    input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, 2, 0, 0);
+    input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, NUM_FINGERS, 0, 0);
 
-#endif
     ret = input_register_device(ts->input_dev);
     if (ret) {
         printk(KERN_ERR "%s: Unable to register %s input device\n", __FUNCTION__,ts->input_dev->name);
