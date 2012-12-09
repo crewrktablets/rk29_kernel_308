@@ -99,35 +99,12 @@
  * front is OV2655 at bus 1 address 0x60.
  *
  */
+#define CM9_KERNEL
 
 #ifdef CONFIG_VIDEO_RK29
 
 /*---------------- Camera Sensor Macro Define Begin  ------------------------*/
 /*---------------- Camera Sensor Configuration Macro Begin ------------------------*/
-
-#ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
-	#define CONFIG_SENSOR_0						 RK29_CAM_SENSOR_OV2655
-	#define CONFIG_SENSOR_IIC_ADDR_0       		 0x60
-	#define CONFIG_SENSOR_ORIENTATION_0       	 270
-	#define CONFIG_SENSOR_IIC_ADAPTER_ID_0    	 1
-	#define CONFIG_SENSOR_POWER_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_RESET_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_POWERDN_PIN_0       	 RK29_PIN6_PB7
-	#define CONFIG_SENSOR_FALSH_PIN_0         	 INVALID_GPIO
-	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_0 	 RK29_CAM_POWERACTIVE_L
-	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_0 	 RK29_CAM_RESETACTIVE_L
-	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0 RK29_CAM_POWERDNACTIVE_H
-	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0 	 RK29_CAM_FLASHACTIVE_L
-
-	#define CONFIG_SENSOR_QCIF_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_QVGA_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_CIF_FPS_FIXED_0       15000
-	#define CONFIG_SENSOR_VGA_FPS_FIXED_0       15000
-	#define CONFIG_SENSOR_480P_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_SVGA_FPS_FIXED_0      15000
-	#define CONFIG_SENSOR_720P_FPS_FIXED_0      30000
-#endif
-
 #ifdef CONFIG_SOC_CAMERA_OV7675				/* front camera sensor */
 	#define CONFIG_SENSOR_1 					 RK29_CAM_SENSOR_OV7675
 	#define CONFIG_SENSOR_IIC_ADDR_1       		 0x42
@@ -150,6 +127,29 @@
 	#define CONFIG_SENSOR_SVGA_FPS_FIXED_1          0
 	#define CONFIG_SENSOR_720P_FPS_FIXED_1          0
 #endif
+
+#ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
+	#define CONFIG_SENSOR_0						 RK29_CAM_SENSOR_OV2655
+	#define CONFIG_SENSOR_IIC_ADDR_0       		 0x60
+	#define CONFIG_SENSOR_ORIENTATION_0       	 90
+	#define CONFIG_SENSOR_IIC_ADAPTER_ID_0    	 1
+	#define CONFIG_SENSOR_POWER_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_RESET_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERDN_PIN_0       	 RK29_PIN6_PB7
+	#define CONFIG_SENSOR_FALSH_PIN_0         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_0 	 RK29_CAM_POWERACTIVE_L
+	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_0 	 RK29_CAM_RESETACTIVE_L
+	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0 RK29_CAM_POWERDNACTIVE_H
+	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0 	 RK29_CAM_FLASHACTIVE_L
+
+	#define CONFIG_SENSOR_QCIF_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_QVGA_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_CIF_FPS_FIXED_0       15000
+	#define CONFIG_SENSOR_VGA_FPS_FIXED_0       15000
+	#define CONFIG_SENSOR_480P_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_SVGA_FPS_FIXED_0      15000
+	#define CONFIG_SENSOR_720P_FPS_FIXED_0      30000
+#endif
 /*---------------- Camera Sensor Configuration Macro End------------------------*/
 #include "../../../drivers/media/video/rk29_camera.c"
 /*---------------- Camera Sensor Macro Define End  ------------------------*/
@@ -169,15 +169,15 @@
 #define V_VD 600
 
 #if (H_VD == 1280)  && (V_VD == 800)
-#define PMEM_UI_SIZE        ((32+64)* SZ_1M)	/* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((32+64)* SZ_1M)
 #elif (H_VD == 1024) && (V_VD == 768)
-#define PMEM_UI_SIZE        ((26+48) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((26+48) * SZ_1M)
 #elif (H_VD == 1024) && (V_VD == 600)
-#define PMEM_UI_SIZE        (60 * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        (60 * SZ_1M)
 #elif (H_VD == 800) && (V_VD == 600)
-#define PMEM_UI_SIZE        ((16+32) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((16+32) * SZ_1M)
 #elif (H_VD == 800) && (V_VD == 480)
-#define PMEM_UI_SIZE        ((12+32) * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
+#define PMEM_UI_SIZE        ((12+32) * SZ_1M)
 #else
 #error "not support lcd"
 #endif
@@ -667,6 +667,7 @@ static struct platform_device rk29_v4l2_output_devce = {
 
 /*MMA8452 gsensor*/
 #if defined (CONFIG_GS_MMA8452)
+
 #define MMA8452_INT_PIN   RK29_PIN0_PA3
 
 static int mma8452_init_platform_hw(void)
@@ -681,34 +682,30 @@ static int mma8452_init_platform_hw(void)
     return 0;
 }
 
-
 static struct mma8452_platform_data mma8452_info = {
   .model= 8452,
   //.swap_xy = 0,
   .swap_xyz = 1,
-  .init_platform_hw= mma8452_init_platform_hw,
-//  .orientation = { -1, 0, 0, 0, 0, 1, 0, 1, 0},
-  /* Orientation for CM9 / ICS */
+  .init_platform_hw = mma8452_init_platform_hw,
+  #ifdef CM9_KERNEL
   .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
-  /* Orientation for CM10 / JB */
-  // .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
+  #else
+  .orientation = { 1, 0, 0,  0,-1, 0,  0, 0, 1},
+  #endif
 };
 #endif
 
 /*
  * Battery & Charge Control
  */
-
-#ifdef CONFIG_BATTERY_RK29_ADC
-#define	 LI_LION_BAT_NUM	1
-
 struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
+		/* Copied configuration from Arnova M19 */
 	.dc_det_pin			= RK29_PIN4_PA1,
 	.batt_low_pin		= RK29_PIN4_PA2,	/* IN: Hardware Bat Low Input */
 	.charge_set_pin		= INVALID_GPIO,		/* OUT: activate charge */
 	.charge_ok_pin		= RK29_PIN4_PA3,	/* IN: HIGH if charged 100% */
 	.power_on_pin		= RK29_PIN4_PA4,	/* OUT: power on / down the system */
-	
+
 	.dc_det_level		= GPIO_LOW,
 	.charge_ok_level	= GPIO_HIGH,
 	.power_on_level		= GPIO_HIGH,
@@ -717,16 +714,14 @@ struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
 	.adc_rset_high	 	= 300,				/* 300R Battery to ADC */
 	.adc_rset_low	 	= 100,				/* 100R ADC to GND */
 	.adc_raw_table_bat 	=					/* Values for 0..100% in steps of 10% */
-		{ 6787, 6904, 7038, 7172, 7306, 7440, 7574, 7708, 7842, 7976, 8110},
+		{ 6618, 6825, 6946, 7024, 7077, 7164, 7307, 7475, 7648, 7864, 8313},
 	.adc_raw_table_ac 	=					/* Same again but while charging */
-		{ 7287, 7414, 7488, 7642, 7740, 7840, 7910, 8000, 8060, 8210, 8310},
+		{ 6868, 7075, 7196, 7274, 7327, 7414, 7557, 7725, 7898, 8114, 8563},
 	.adc_bat_levels		=
-		{ 8140,		/* 8.149V Maximum */
-		  6787, 	/* 6.787V zero cut-off voltage */
-		  7450},	/* 7.450V average voltage */
+		{ 8303,		/* 8.30V Maximum */
+		  6000, 	/* 6.00V zero cut-off voltage */
+		  7450},	/* 7.45V average voltage */
 };
-#endif
-
 
 /*****************************************************************************************
  * i2c devices
@@ -855,7 +850,7 @@ struct i2c_gpio_platform_data default_i2c3_data = {
        .io_init = rk29_i2c3_io_init,
 };
 #endif
-#ifdef CONFIG_I2C0_RK29
+
 static struct i2c_board_info __initdata board_i2c0_devices[] = {
 #if defined (CONFIG_RK1000_CONTROL)
 	{
@@ -900,33 +895,25 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
 		.platform_data  = &bq27510_info,
 	},
 #endif
-#if defined (CONFIG_RTC_HYM8563)
 	{
 		.type    		= "rtc_hym8563",
 		.addr           = 0x51,
 		.flags			= 0,
 		.irq            = RK29_PIN0_PA1,
 	},
-#endif
-#if defined (CONFIG_GS_MMA8452)
-    {
+	{
       .type           = "gs_mma8452",
       .addr           = 0x1c,
       .flags          = 0,
       .irq            = MMA8452_INT_PIN,
       .platform_data  = &mma8452_info,
     },
-#endif
 };
-#endif
 
-#if defined (CONFIG_ANX7150)
 struct hdmi_platform_data anx7150_data = {
        //.io_init = anx7150_io_init,
 };
-#endif
 
-#ifdef CONFIG_I2C1_RK29
 static struct i2c_board_info __initdata board_i2c1_devices[] = {
 #if defined (CONFIG_RK1000_CONTROL1)
 	{
@@ -935,7 +922,6 @@ static struct i2c_board_info __initdata board_i2c1_devices[] = {
 		.flags			= 0,
 	},
 #endif
-#if defined (CONFIG_ANX7150)
     {
 		.type           = "anx7150",
         .addr           = 0x39,
@@ -943,13 +929,9 @@ static struct i2c_board_info __initdata board_i2c1_devices[] = {
         .irq            = RK29_PIN1_PD7,
 		.platform_data  = &anx7150_data,
     },
-#endif
 };
-#endif
 
-#ifdef CONFIG_I2C2_RK29
 static struct i2c_board_info __initdata board_i2c2_devices[] = {
-#if defined (CONFIG_I2C_SIS809)
     {
       .type				= "sis809_touch",
       .addr				= 0x5c,
@@ -957,19 +939,9 @@ static struct i2c_board_info __initdata board_i2c2_devices[] = {
       .irq				= RK29_PIN0_PA2,
       .platform_data	= &i2c_sis809_info,
     },
-#endif
 
-#if defined (CONFIG_I2C_LZ300) || defined (CONFIG_I2C_LZ300_STO)
-    {
-      .type				= "lz300msf",
-      .addr				= 0x48,
-      .flags			= 0,
-      .irq				= RK29_PIN0_PA2,
-      .platform_data	= &i2c_lz300_info,
-    },
-#endif
 };
-#endif
+
 
 #ifdef CONFIG_I2C3_RK29
 static struct i2c_board_info __initdata board_i2c3_devices[] = {
