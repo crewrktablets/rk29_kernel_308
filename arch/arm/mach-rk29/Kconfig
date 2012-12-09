@@ -88,7 +88,13 @@ config MACH_ODYS_XPRESS
 	bool "ROCKCHIP based Tablet ODYS Xpress"
         help
 	  Support for the ROCKCHIP RK2918 based Android Tablet ODYS Xpress.
-		  
+		 
+config MACH_EASYPAD_JUN
+	depends on ARCH_RK29
+	bool "ROCKCHIP based Tablet Easypad Junior"
+        help
+	  Support for the ROCKCHIP RK2918 based Android Tablet Easypad Junior.
+		 
 endchoice
 
 config RK29_NEWTON_CLOCK

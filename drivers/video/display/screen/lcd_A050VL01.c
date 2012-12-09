@@ -12,7 +12,7 @@
 #define OUT_TYPE		SCREEN_RGB
 #define OUT_FACE		OUT_P888
 #define OUT_CLK			23500000
-#define LCDC_ACLK       150000000     //29 lcdc axi DMA ÆµÂÊ
+#define LCDC_ACLK      150000000     //29 lcdc axi DMA ÆµÂÊ
 
 /* Timing */
 #define H_PW			2
@@ -319,11 +319,34 @@ int init(void)
 }
 #endif
 
-extern void rk29_lcd_spim_spin_lock(void);
-extern void rk29_lcd_spim_spin_unlock(void);
+/* AX: Disabled this for incompatibility and using this display for
+ * Easypad Junior
+ */
+#if 0
+
+int lcd_standby(u8 enable)
+{
+	if(gLcd_info)
+		gLcd_info->io_init();
+	if(enable) {
+		printk("LCD suspend\n");
+	} else {
+		spi_screenreg_set(0x0,0x1c);
+		mdelay(10);
+	}
+
+	if(gLcd_info)
+	gLcd_info->io_deinit();
+	return 0;
+}
+
+#else
+// extern void rk29_lcd_spim_spin_lock(void);
+// extern void rk29_lcd_spim_spin_unlock(void);
+
 int standby(u8 enable)
 {
-	rk29_lcd_spim_spin_lock();
+//	rk29_lcd_spim_spin_lock();
 	if(gLcd_info)
 	        gLcd_info->io_init();
 	if(enable) {
@@ -342,7 +365,7 @@ int standby(u8 enable)
 	}
 	if(gLcd_info)
 	        gLcd_info->io_deinit();
-	rk29_lcd_spim_spin_unlock();        
+//	rk29_lcd_spim_spin_unlock();
     return 0;
 }
-
+#endif
