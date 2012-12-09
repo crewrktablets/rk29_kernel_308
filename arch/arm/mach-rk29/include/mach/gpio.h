@@ -32,10 +32,10 @@ typedef enum eGPIOPinDirection
 typedef enum GPIOPullType {
 	PullDisable = 0,
 	PullEnable,
-	GPIONormal,  //PullEnable, please do not use it
-	GPIOPullUp,	//PullEnable, please do not use it
-	GPIOPullDown,//PullEnable, please do not use it
-	GPIONOInit,//PullEnable, please do not use it
+	GPIONormal,  	//PullEnable, please do not use it
+	GPIOPullUp,		//PullEnable, please do not use it
+	GPIOPullDown,	//PullEnable, please do not use it
+	GPIONOInit,		//PullEnable, please do not use it
 }eGPIOPullType_t;
 
 typedef enum GPIOIntType {
@@ -46,18 +46,18 @@ typedef enum GPIOIntType {
 }eGPIOIntType_t;
 
 //����GPIO��ؼĴ���ƫ�Ƶ�ַ
-#define 	GPIO_SWPORT_DR		0x00
-#define 	GPIO_SWPORT_DDR		0x04
-#define 	GPIO_INTEN 			0x30
-#define 	GPIO_INTMASK 		0x34
-#define 	GPIO_INTTYPE_LEVEL 	0x38
-#define 	GPIO_INT_POLARITY 	0x3c
-#define 	GPIO_INT_STATUS 	0x40
-#define 	GPIO_INT_RAWSTATUS  0x44
-#define 	GPIO_DEBOUNCE 		0x48
-#define 	GPIO_PORTS_EOI 		0x4c
-#define 	GPIO_EXT_PORT		0x50
-#define 	GPIO_LS_SYNC 		0x60
+#define 	GPIO_SWPORT_DR		0x00	/*< Data Register */
+#define 	GPIO_SWPORT_DDR		0x04	/*< Data Direction Register */
+#define 	GPIO_INTEN 			0x30	/*< Interrupt Enable Register */
+#define 	GPIO_INTMASK 		0x34	/*< Interrupt Mask Register */
+#define 	GPIO_INTTYPE_LEVEL 	0x38	/*< Interrupt Type Register */
+#define 	GPIO_INT_POLARITY 	0x3c	/*< Interrupt Polarity Register */
+#define 	GPIO_INT_STATUS 	0x40	/*< Interrupt Status Register */
+#define 	GPIO_INT_RAWSTATUS  0x44	/*< ?? */
+#define 	GPIO_DEBOUNCE 		0x48	/*< Debounce Control Register */
+#define 	GPIO_PORTS_EOI 		0x4c	/*< ?? End Of Interrupt ?? */
+#define 	GPIO_EXT_PORT		0x50	/*< ?? */
+#define 	GPIO_LS_SYNC 		0x60	/*< ?? */
 
 #define RK29_ID_GPIO0			0
 #define RK29_ID_GPIO1			1
