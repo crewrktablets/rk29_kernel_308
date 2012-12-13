@@ -15,16 +15,25 @@ fi
 make distclean
 # loop through each device
 for device in ${DEVICES} ; do
-  echo "***\n*** Building kernel for device: ${device} ***\n***\n"
+  echo "*** Building kernel for device: ${device} ***"
   # make mrproper
+  rm kernel.img
   make odys_${device}_defconfig
   make ${MAKE_OPTIONS} kernel.img modules 2>&1 | tee build.log
+  
+  # abort on missing make result
+  if [ ! -f kernel.img ]; then echo "ABORTED WITH ERROR"; exit; fi
+  
+  # archive kernel.img
   mkdir -p ${KERNEL_PATH}/${device}
   cp kernel.img ${KERNEL_PATH}/${device}/
-  tar cjvf ${KERNEL_PATH}/kernel_308_${device}_${rev}.tar.bz2 kernel.img
+  7z a ${KERNEL_PATH}/kernel_308_${device}_${rev}.7z kernel.img
+
+  # tag current git state with delivery tag
+  git tag ${device}_${rev}
 done
 # create package of all available modules
 MODULES=`find . -name '*.ko'`
-tar cjvf ${KERNEL_PATH}/modules_308_${rev}.tar.bz2 ${MODULES}
+7z a ${KERNEL_PATH}/modules_308_${rev}.7z ${MODULES}
 
 
