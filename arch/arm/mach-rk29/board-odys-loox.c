@@ -111,10 +111,12 @@
 #ifdef CONFIG_SOC_CAMERA_OV7675             /* front camera sensor */
     #define CONFIG_SENSOR_0                      RK29_CAM_SENSOR_OV7675
     #define CONFIG_SENSOR_IIC_ADDR_0             0x42
-#ifdef CM9_KERNEL
-    #define CONFIG_SENSOR_ORIENTATION_0          0
-#else
-    #define CONFIG_SENSOR_ORIENTATION_0          90
+#if defined( CM10_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_1          0
+#elif defined( CM9_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_1          0
+#else  
+    #define CONFIG_SENSOR_ORIENTATION_1          90
 #endif
     #define CONFIG_SENSOR_IIC_ADAPTER_ID_0       1
     #define CONFIG_SENSOR_POWER_PIN_0            INVALID_GPIO
@@ -138,9 +140,11 @@
 #ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
 	#define CONFIG_SENSOR_1						 RK29_CAM_SENSOR_OV2655
 	#define CONFIG_SENSOR_IIC_ADDR_1       		 0x60
-#ifdef CM9_KERNEL
+#if defined( CM10_KERNEL )
     #define CONFIG_SENSOR_ORIENTATION_1          0
-#else
+#elif defined( CM9_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_1          0
+#else  
     #define CONFIG_SENSOR_ORIENTATION_1          90
 #endif
 	#define CONFIG_SENSOR_IIC_ADAPTER_ID_1    	 1
@@ -1059,11 +1063,13 @@ static struct mma8452_platform_data mma8452_info = {
   //.swap_xy = 0,
   .swap_xyz = 1,
   .init_platform_hw= mma8452_init_platform_hw,
-  #ifdef CM9_KERNEL
+#if defined( CM9_KERNEL)
+	.orientation = { 1, 0, 0,  0,-1, 0,  0, 0, 1},
+#elif defined( CM10_KERNEL)
   .orientation = {  1, 0, 0,   0,-1, 0,  0, 0, 1},
-  #else
+#else
   .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
-  #endif
+#endif
 };
 #endif
 
