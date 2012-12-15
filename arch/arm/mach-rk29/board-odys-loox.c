@@ -113,11 +113,11 @@
     #define CONFIG_SENSOR_0                      RK29_CAM_SENSOR_OV7675
     #define CONFIG_SENSOR_IIC_ADDR_0             0x42
 #if defined( CM10_KERNEL )
-    #define CONFIG_SENSOR_ORIENTATION_1          0
+    #define CONFIG_SENSOR_ORIENTATION_0          0
 #elif defined( CM9_KERNEL )
-    #define CONFIG_SENSOR_ORIENTATION_1          0
+    #define CONFIG_SENSOR_ORIENTATION_0          0
 #else
-    #define CONFIG_SENSOR_ORIENTATION_1          90
+    #define CONFIG_SENSOR_ORIENTATION_0          90
 #endif
     #define CONFIG_SENSOR_IIC_ADAPTER_ID_0       1
     #define CONFIG_SENSOR_POWER_PIN_0            INVALID_GPIO

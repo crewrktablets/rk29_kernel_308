@@ -56,7 +56,7 @@ module_param(debug, int, S_IRUGO|S_IWUSR);
 #define SENSOR_INIT_WINSEQADR		sensor_vga
 #define SENSOR_INIT_PIXFMT			V4L2_MBUS_FMT_YUYV8_2X8
 
-#define CONFIG_SENSOR_WhiteBalance	1
+#define CONFIG_SENSOR_WhiteBalance	0
 #define CONFIG_SENSOR_Brightness	0
 #define CONFIG_SENSOR_Contrast		0
 #define CONFIG_SENSOR_Saturation	0
@@ -67,7 +67,7 @@ module_param(debug, int, S_IRUGO|S_IWUSR);
 #define CONFIG_SENSOR_Exposure		0
 #define CONFIG_SENSOR_Flash			0
 #define CONFIG_SENSOR_Mirror		0	/* Loox 4.1.1: 0 */
-#define CONFIG_SENSOR_Flip         0	/* Loox 4.1.1: 0 */
+#define CONFIG_SENSOR_Flip          0	/* Loox 4.1.1: 0 */
 
 #define CONFIG_SENSOR_I2C_SPEED     250000       /* Hz */
 /* Sensor write register continues by preempt_disable/preempt_enable for current process not be scheduled */
