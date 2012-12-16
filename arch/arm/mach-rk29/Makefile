@@ -28,3 +28,4 @@ obj-$(CONFIG_MACH_ODYS_LOOX) += board-odys-loox.o board-rk29sdk-key.o board-rk29
 obj-$(CONFIG_MACH_ODYS_LOOX_PLUS) += board-odys-loox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_ODYS_NEXT) += board-odys-loox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_ODYS_XPRESS) += board-odys-xpress.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
+obj-$(CONFIG_MACH_EASYPAD_JUN) += board-easypad-junior.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o

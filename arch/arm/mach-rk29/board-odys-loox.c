@@ -103,66 +103,68 @@
  */
 
 // #define CM9_KERNEL
-#define CM10_KERNEL
+// #define CM10_KERNEL
 
 #ifdef CONFIG_VIDEO_RK29
 
 /*---------------- Camera Sensor Macro Define Begin  ------------------------*/
 /*---------------- Camera Sensor Configuration Macro Begin ------------------------*/
 #ifdef CONFIG_SOC_CAMERA_OV7675             /* front camera sensor */
-    #define CONFIG_SENSOR_0							RK29_CAM_SENSOR_OV7675
-    #define CONFIG_SENSOR_IIC_ADDR_0				0x42
-#if defined( CM9_KERNEL)
-    #define CONFIG_SENSOR_ORIENTATION_0				0
-#elif defined( CM10_KERNEL)
-    #define CONFIG_SENSOR_ORIENTATION_0				90
+    #define CONFIG_SENSOR_0                      RK29_CAM_SENSOR_OV7675
+    #define CONFIG_SENSOR_IIC_ADDR_0             0x42
+#if defined( CM10_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_0          0
+#elif defined( CM9_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_0          0
 #else
-	#define  CONFIG_SENSOR_ORIENTATION_0			270	// Loox 4.1.1
+    #define CONFIG_SENSOR_ORIENTATION_0          90
 #endif
-    #define CONFIG_SENSOR_IIC_ADAPTER_ID_0			1
-    #define CONFIG_SENSOR_POWER_PIN_0				INVALID_GPIO
-    #define CONFIG_SENSOR_RESET_PIN_0				INVALID_GPIO
-    #define CONFIG_SENSOR_POWERDN_PIN_0				RK29_PIN5_PD7
-    #define CONFIG_SENSOR_FALSH_PIN_0				INVALID_GPIO
-    #define CONFIG_SENSOR_POWERACTIVE_LEVEL_0		RK29_CAM_POWERACTIVE_L
-    #define CONFIG_SENSOR_RESETACTIVE_LEVEL_0		RK29_CAM_RESETACTIVE_L
-    #define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0		RK29_CAM_POWERDNACTIVE_H
-    #define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0		RK29_CAM_FLASHACTIVE_L
+    #define CONFIG_SENSOR_IIC_ADAPTER_ID_0       1
+    #define CONFIG_SENSOR_POWER_PIN_0            INVALID_GPIO
+    #define CONFIG_SENSOR_RESET_PIN_0            INVALID_GPIO
+    #define CONFIG_SENSOR_POWERDN_PIN_0          RK29_PIN5_PD7
+    #define CONFIG_SENSOR_FALSH_PIN_0            INVALID_GPIO
+    #define CONFIG_SENSOR_POWERACTIVE_LEVEL_0    RK29_CAM_POWERACTIVE_L
+    #define CONFIG_SENSOR_RESETACTIVE_LEVEL_0    RK29_CAM_RESETACTIVE_L
+    #define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_0  RK29_CAM_POWERDNACTIVE_H
+    #define CONFIG_SENSOR_FLASHACTIVE_LEVEL_0    RK29_CAM_FLASHACTIVE_L
 
-	#define CONFIG_SENSOR_QCIF_FPS_FIXED_0			15000
-	#define CONFIG_SENSOR_QVGA_FPS_FIXED_0			15000
-	#define CONFIG_SENSOR_CIF_FPS_FIXED_0			15000
-	#define CONFIG_SENSOR_VGA_FPS_FIXED_0			15000
-	#define CONFIG_SENSOR_480P_FPS_FIXED_0			0
-	#define CONFIG_SENSOR_SVGA_FPS_FIXED_0			15000
-	#define CONFIG_SENSOR_720P_FPS_FIXED_0			0
+    #define CONFIG_SENSOR_QCIF_FPS_FIXED_0      15000
+    #define CONFIG_SENSOR_QVGA_FPS_FIXED_0      15000
+    #define CONFIG_SENSOR_CIF_FPS_FIXED_0       15000
+    #define CONFIG_SENSOR_VGA_FPS_FIXED_0       15000
+    #define CONFIG_SENSOR_480P_FPS_FIXED_0      15000
+    #define CONFIG_SENSOR_SVGA_FPS_FIXED_0      15000
+    #define CONFIG_SENSOR_720P_FPS_FIXED_0      30000
 #endif
 
 #ifdef CONFIG_SOC_CAMERA_OV2655				/* rear camera sensor */
-	#define CONFIG_SENSOR_1							RK29_CAM_SENSOR_OV2655
-	#define CONFIG_SENSOR_IIC_ADDR_1				0x00	/* Device not available on loox */
-#ifdef CM9_KERNEL
-    #define CONFIG_SENSOR_ORIENTATION_1				0
+	#define CONFIG_SENSOR_1						 RK29_CAM_SENSOR_OV2655
+	#define CONFIG_SENSOR_IIC_ADDR_1       		 0x60
+#if defined( CM10_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_1          0
+#elif defined( CM9_KERNEL )
+    #define CONFIG_SENSOR_ORIENTATION_1          0
 #else
-    #define CONFIG_SENSOR_ORIENTATION_1				90
+    #define CONFIG_SENSOR_ORIENTATION_1          90
 #endif
-	#define CONFIG_SENSOR_IIC_ADAPTER_ID_1			1
-	#define CONFIG_SENSOR_POWER_PIN_1				INVALID_GPIO
-	#define CONFIG_SENSOR_RESET_PIN_1				INVALID_GPIO
-	#define CONFIG_SENSOR_POWERDN_PIN_1				RK29_PIN6_PB7
-	#define CONFIG_SENSOR_FALSH_PIN_1				INVALID_GPIO
-	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_1		RK29_CAM_POWERACTIVE_L
-	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_1		RK29_CAM_RESETACTIVE_L
-	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_1		RK29_CAM_POWERDNACTIVE_H
-	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_1		RK29_CAM_FLASHACTIVE_L
+	#define CONFIG_SENSOR_IIC_ADAPTER_ID_1    	 1
+	#define CONFIG_SENSOR_POWER_PIN_1         	 INVALID_GPIO
+	#define CONFIG_SENSOR_RESET_PIN_1         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERDN_PIN_1       	 RK29_PIN6_PB7
+	#define CONFIG_SENSOR_FALSH_PIN_1         	 INVALID_GPIO
+	#define CONFIG_SENSOR_POWERACTIVE_LEVEL_1 	 RK29_CAM_POWERACTIVE_L
+	#define CONFIG_SENSOR_RESETACTIVE_LEVEL_1 	 RK29_CAM_RESETACTIVE_L
+	#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_1  RK29_CAM_POWERDNACTIVE_H
+	#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_1 	 RK29_CAM_FLASHACTIVE_L
 
-	#define CONFIG_SENSOR_QCIF_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_QVGA_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_CIF_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_VGA_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_480P_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_SVGA_FPS_FIXED_1			0
-	#define CONFIG_SENSOR_720P_FPS_FIXED_1			0
+	#define CONFIG_SENSOR_QCIF_FPS_FIXED_1      15000
+	#define CONFIG_SENSOR_QVGA_FPS_FIXED_1      15000
+	#define CONFIG_SENSOR_CIF_FPS_FIXED_1       15000
+	#define CONFIG_SENSOR_VGA_FPS_FIXED_1       15000
+	#define CONFIG_SENSOR_480P_FPS_FIXED_1      15000
+	#define CONFIG_SENSOR_SVGA_FPS_FIXED_1      15000
+	#define CONFIG_SENSOR_720P_FPS_FIXED_1      30000
 #endif
 
 #endif  //#ifdef CONFIG_VIDEO_RK29
@@ -225,6 +227,7 @@ struct wifi_mem_prealloc {
         void *mem_ptr;
         unsigned long size;
 };
+
 
 extern struct sys_timer rk29_timer;
 
@@ -502,7 +505,129 @@ struct platform_device rk29_device_newton = {
 	};
 #endif
 
+#if defined (CONFIG_TOUCHSCREEN_FT5406)
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
+int ft5406_init_platform_hw(void)
+{
+	printk("ft5406_init_platform_hw\n");
+    if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+      gpio_free(TOUCH_RESET_PIN);
+      printk("ft5406_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
 
+    if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+      gpio_free(TOUCH_INT_PIN);
+      printk("ift5406_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+
+	gpio_direction_output(TOUCH_RESET_PIN, 0);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	mdelay(10);
+	gpio_direction_input(TOUCH_INT_PIN);
+	mdelay(10);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	msleep(300);
+    return 0;
+}
+
+void ft5406_exit_platform_hw(void)
+{
+	printk("ft5406_exit_platform_hw\n");
+	gpio_free(TOUCH_RESET_PIN);
+	gpio_free(TOUCH_INT_PIN);
+}
+
+int ft5406_platform_sleep(void)
+{
+	printk("ft5406_platform_sleep\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+int ft5406_platform_wakeup(void)
+{
+	printk("ft5406_platform_wakeup\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	msleep(300);
+	return 0;
+}
+
+struct ft5406_platform_data ft5406_info = {
+
+  .init_platform_hw= ft5406_init_platform_hw,
+  .exit_platform_hw= ft5406_exit_platform_hw,
+  .platform_sleep  = ft5406_platform_sleep,
+  .platform_wakeup = ft5406_platform_wakeup,
+
+};
+#endif
+
+#if defined (CONFIG_I2C_SIS809)
+
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
+
+static int sis809_init_platform_hw(void)
+{
+	if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+		gpio_free(TOUCH_RESET_PIN);
+		printk("sis809_init_platform_hw TOUCH_RESET_PIN error\n");
+		return -EIO;
+	}
+
+	if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+		gpio_free(TOUCH_INT_PIN);
+		printk("sis809_init_platform_hw TOUCH_INT_PIN error\n");
+		return -EIO;
+	}
+
+	gpio_pull_updown(TOUCH_INT_PIN, 1);
+	gpio_direction_output(TOUCH_RESET_PIN, 0);
+	msleep(500);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	msleep(500);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	//	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+void sis809_exit_platform_hw(void)
+{
+	printk("sis809_exit_platform_hw\n");
+	gpio_free(TOUCH_RESET_PIN);
+	gpio_free(TOUCH_INT_PIN);
+}
+
+int sis809_platform_sleep(void)
+{
+	printk("sis809_platform_sleep\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+int sis809_platform_wakeup(void)
+{
+	printk("sis809_platform_wakeup\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	//msleep(5);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_LOW);
+	//msleep(20);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_HIGH);
+	return 0;
+}
+
+static struct sis809_platform_data i2c_sis809_info = {
+	.model= 1003,
+	.init_platform_hw = sis809_init_platform_hw,
+	.exit_platform_hw = sis809_exit_platform_hw,
+	.platform_sleep   = sis809_platform_sleep,
+	.platform_wakeup  = sis809_platform_wakeup,
+};
+
+#endif
 
 #if defined (CONFIG_I2C_LZ300) || defined (CONFIG_I2C_LZ300_STO)
 #define TOUCH_RESET_PIN RK29_PIN6_PC3
@@ -543,14 +668,179 @@ static struct i2c_lz300_platform_data i2c_lz300_info = {
 #endif
 
 
+#if defined(CONFIG_TOUCHSCREEN_GT819)
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
+int gt819_init_platform_hw(void)
+{
+	printk("gt819_init_platform_hw\n");
+    if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+      gpio_free(TOUCH_RESET_PIN);
+      printk("gt819_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
 
+    if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+      gpio_free(TOUCH_INT_PIN);
+      printk("gt819_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+	gpio_direction_output(TOUCH_RESET_PIN, 0);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	mdelay(10);
+//	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+//	mdelay(10);
+//	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	gpio_direction_input(TOUCH_INT_PIN);
+//	mdelay(10);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	msleep(300);
+    return 0;
+}
+
+
+void gt819_exit_platform_hw(void)
+{
+	printk("gt819_exit_platform_hw\n");
+	gpio_free(TOUCH_RESET_PIN);
+	gpio_free(TOUCH_INT_PIN);
+}
+
+int gt819_platform_sleep(void)
+{
+	printk("gt819_platform_sleep\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+int gt819_platform_wakeup(void)
+{
+	printk("gt819_platform_wakeup\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	//msleep(5);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_LOW);
+	//msleep(20);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_HIGH);
+	return 0;
+}
+
+struct goodix_platform_data goodix_info = {
+	.init_platform_hw = gt819_init_platform_hw,
+	.exit_platform_hw = gt819_exit_platform_hw,
+	.platform_sleep   = gt819_platform_sleep,
+	.platform_wakeup  = gt819_platform_wakeup,
+};
+#endif
+
+#if defined(CONFIG_TOUCHSCREEN_GT801_IIC)
+#include <../../../drivers/input/touchscreen/gt801_ts.h>
+
+#define TOUCH_RESET_PIN  RK29_PIN6_PC3
+#define TOUCH_PWR_PIN    RK29_PIN5_PA1
+#define TOUCH_INT_PIN    RK29_PIN0_PA2
+
+static int gt801_init_platform_hw(void)
+{
+    int ret;
+    printk("%s\n", __FUNCTION__);
+
+    // check availability of power pin
+    ret = gpio_request(TOUCH_PWR_PIN, "TS power pin");
+    if(ret != 0){
+        gpio_free(TOUCH_PWR_PIN);
+        printk("TS power error\n");
+        return -EIO;
+    }
+    // set up power pin
+    gpio_direction_output(TOUCH_PWR_PIN, 0);
+    gpio_set_value(TOUCH_PWR_PIN,GPIO_LOW);
+    msleep(100);
+
+    return 0;
+}
+
+static struct gt801_platform_data gt801_info =
+{
+    .model					= 801,
+    .x_min                  = 0,
+    .x_max                  = 800,
+    .y_min                  = 0,
+    .y_max                  = 600,
+    .options                = GT801_OPT_SWAP_XY
+                             |GT801_OPT_INV_X
+                             |GT801_OPT_INV_Y,
+    .gpio_reset 			= TOUCH_RESET_PIN,
+    .gpio_reset_active_low 	= 0,
+    .gpio_pendown 			= TOUCH_INT_PIN,
+    .init_platform_hw       = gt801_init_platform_hw,
+};
+#endif
+
+#if defined(CONFIG_TOUCHSCREEN_GT8XX)
+#define TOUCH_RESET_PIN  RK29_PIN6_PC3
+#define TOUCH_PWR_PIN    RK29_PIN5_PA1
+int goodix_init_platform_hw(void)
+{
+	int ret;
+	printk("goodix_init_platform_hw\n");
+	ret = gpio_request(TOUCH_PWR_PIN, "goodix power pin");
+	if(ret != 0){
+		gpio_free(TOUCH_PWR_PIN);
+		printk("goodix power error\n");
+		return -EIO;
+	}
+	gpio_direction_output(TOUCH_PWR_PIN, 0);
+	gpio_set_value(TOUCH_PWR_PIN,GPIO_LOW);
+	msleep(100);
+	ret = gpio_request(TOUCH_RESET_PIN, "goodix reset pin");
+	if(ret != 0){
+		gpio_free(TOUCH_RESET_PIN);
+		printk("goodix gpio_request error\n");
+		return -EIO;
+	}
+	gpio_direction_output(TOUCH_RESET_PIN, 0);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	msleep(10);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	msleep(500);
+	return 0;
+}
+
+struct goodix_platform_data goodix_info = {
+	  .model= 8105,
+	  .irq_pin = RK29_PIN0_PA2,
+	  .rest_pin  = TOUCH_RESET_PIN,
+	  .init_platform_hw = goodix_init_platform_hw,
+};
+#endif
+
+#if defined (CONFIG_SND_SOC_CS42L52)
+
+int cs42l52_init_platform_hw()
+{
+	printk("cs42l52_init_platform_hw\n");
+    if(gpio_request(RK29_PIN6_PB6,NULL) != 0){
+      gpio_free(RK29_PIN6_PB6);
+      printk("cs42l52_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+    gpio_direction_output(RK29_PIN6_PB6, 0);
+	gpio_set_value(RK29_PIN6_PB6,GPIO_HIGH);
+	return 0;
+}
+struct cs42l52_platform_data cs42l52_info = {
+
+  .init_platform_hw= cs42l52_init_platform_hw,
+
+};
+#endif
 
 #if defined (CONFIG_BATTERY_BQ27541)
 
-#define DC_CHECK_PIN		RK29_PIN4_PA1
-#define LI_LION_BAT_NUM		1
-#define CHG_OK				RK29_PIN4_PA3
-#define BAT_LOW				RK29_PIN4_PA2
+#define	DC_CHECK_PIN	RK29_PIN4_PA1
+#define	LI_LION_BAT_NUM	1
+#define CHG_OK RK29_PIN4_PA3
+#define BAT_LOW	RK29_PIN4_PA2
 
 static int bq27541_init_dc_check_pin(void)
 {
@@ -652,33 +942,163 @@ static struct platform_device rk29_v4l2_output_devce = {
 #endif
 
 
-/*MMA8452 gsensor*/
-#define MMA8452_INT_PIN   RK29_PIN0_PA3
-static int mma8452_init_platform_hw(void)
-{
+/*HANNSTAR_P1003 touch*/
+#if defined (CONFIG_HANNSTAR_P1003)
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
 
-    if(gpio_request(MMA8452_INT_PIN,NULL) != 0){
-      gpio_free(MMA8452_INT_PIN);
-      printk("mma8452_init_platform_hw gpio_request error\n");
+int p1003_init_platform_hw(void)
+{
+    if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+      gpio_free(TOUCH_RESET_PIN);
+      printk("p1003_init_platform_hw gpio_request error\n");
       return -EIO;
     }
-    gpio_pull_updown(MMA8452_INT_PIN, 1);
+
+    if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+      gpio_free(TOUCH_INT_PIN);
+      printk("p1003_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+    gpio_pull_updown(TOUCH_INT_PIN, 1);
+    gpio_direction_output(TOUCH_RESET_PIN, 0);
+    msleep(500);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+    msleep(500);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+
     return 0;
 }
 
+
+struct p1003_platform_data p1003_info = {
+  .model= 1003,
+  .init_platform_hw= p1003_init_platform_hw,
+
+};
+#endif
+
+
+#if defined (CONFIG_EETI_EGALAX)
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
+
+static int EETI_EGALAX_init_platform_hw(void)
+{
+    if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+      gpio_free(TOUCH_RESET_PIN);
+      printk("p1003_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+
+    if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+      gpio_free(TOUCH_INT_PIN);
+      printk("p1003_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+    gpio_pull_updown(TOUCH_INT_PIN, 1);
+    gpio_direction_output(TOUCH_RESET_PIN, 0);
+    msleep(500);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+    msleep(500);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+
+    return 0;
+}
+
+
+static struct eeti_egalax_platform_data eeti_egalax_info = {
+  .model= 1003,
+  .init_platform_hw= EETI_EGALAX_init_platform_hw,
+  .standby_pin = TOUCH_SCREEN_STANDBY_PIN,
+  .standby_value = TOUCH_SCREEN_STANDBY_VALUE,
+  .disp_on_pin = TOUCH_SCREEN_DISPLAY_PIN,
+  .disp_on_value = TOUCH_SCREEN_DISPLAY_VALUE,
+};
+#endif
+
+#ifdef CONFIG_GS_KXTF9
+#include <linux/kxtf9.h>
+#define KXTF9_DEVICE_MAP 1
+#define KXTF9_MAP_X (KXTF9_DEVICE_MAP-1)%2
+#define KXTF9_MAP_Y KXTF9_DEVICE_MAP%2
+#define KXTF9_NEG_X (KXTF9_DEVICE_MAP/2)%2
+#define KXTF9_NEG_Y (KXTF9_DEVICE_MAP+1)/4
+#define KXTF9_NEG_Z (KXTF9_DEVICE_MAP-1)/4
+struct kxtf9_platform_data kxtf9_pdata = {
+	.min_interval = 1,
+	.poll_interval = 20,
+	.g_range = KXTF9_G_2G,
+	.axis_map_x = KXTF9_MAP_X,
+	.axis_map_y = KXTF9_MAP_Y,
+	.axis_map_z = 2,
+	.negate_x = KXTF9_NEG_X,
+	.negate_y = KXTF9_NEG_Y,
+	.negate_z = KXTF9_NEG_Z,
+	//.ctrl_regc_init = KXTF9_G_2G | ODR50F,
+	//.ctrl_regb_init = ENABLE,
+};
+#endif /* CONFIG_GS_KXTF9 */
+
+
+#define GSENSOR_INT_PIN   RK29_PIN0_PA3
+
+/*MMA8452 gsensor*/
+#if defined (CONFIG_GS_MMA8452)
+
+static int mma8452_init_platform_hw(void)
+{
+
+    if(gpio_request(GSENSOR_INT_PIN,NULL) != 0){
+      gpio_free(GSENSOR_INT_PIN);
+      printk("mma8452_init_platform_hw gpio_request error\n");
+      return -EIO;
+    }
+    gpio_pull_updown(GSENSOR_INT_PIN, 1);
+    return 0;
+}
+
+
 static struct mma8452_platform_data mma8452_info = {
-	.model= 8452,
-	//.swap_xy = 0,
-	.swap_xyz = 1,
-	.init_platform_hw = mma8452_init_platform_hw,
+  .model= 8452,
+  //.swap_xy = 0,
+  .swap_xyz = 1,
+  .init_platform_hw= mma8452_init_platform_hw,
 #if defined( CM9_KERNEL)
 	.orientation = { 1, 0, 0,  0,-1, 0,  0, 0, 1},
 #elif defined( CM10_KERNEL)
-	.orientation = { 1, 0, 0,  0,-1, 0,  0, 0, 1},	/* Loox 4.1.2 */
-#else
-	.orientation = { 0,-1, 0, -1, 0, 0,  0, 0,-1}, /* Loox 4.1.1 */
-#endif
+  .orientation = {  1, 0, 0,   0,-1, 0,  0, 0, 1},
+  #else
+  .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
+  #endif
 };
+#endif
+
+/*mpu3050*/
+#if defined (CONFIG_MPU_SENSORS_MPU3050)
+static struct mpu_platform_data mpu3050_data = {
+	.int_config = 0x10,
+	.orientation = { 1, 0, 0,0, 1, 0, 0, 0, 1 },
+};
+#endif
+
+/* accel */
+#if defined (CONFIG_MPU_SENSORS_KXTF9)
+static struct ext_slave_platform_data inv_mpu_kxtf9_data = {
+	.bus         = EXT_SLAVE_BUS_SECONDARY,
+	.adapt_num = 0,
+	.orientation = {1, 0, 0, 0, 1, 0, 0, 0, 1},
+};
+#endif
+
+/* compass */
+#if defined (CONFIG_MPU_SENSORS_AK8975)
+static struct ext_slave_platform_data inv_mpu_ak8975_data = {
+	.bus         = EXT_SLAVE_BUS_PRIMARY,
+	.adapt_num = 0,
+	.orientation = {0, 1, 0, -1, 0, 0, 0, 0, 1},
+};
+#endif
 
 #if defined (CONFIG_BATTERY_BQ27510)
 #define	DC_CHECK_PIN	RK29_PIN4_PA1
@@ -706,15 +1126,15 @@ struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
 	.batt_low_pin    = RK29_PIN4_PA2,
 	.charge_set_pin  = INVALID_GPIO,
 	.charge_ok_pin   = RK29_PIN4_PA3,
-
-	//TODO: Check if this exists in loox too
-	//.power_on_pin		= RK29_PIN4_PA4,	/* OUT: power on / down the system */
-	//.power_on_level		= GPIO_HIGH,
-
+	
 	.dc_det_level    = GPIO_LOW,
 	.charge_ok_level = GPIO_HIGH,
-
+#if defined(CONFIG_MACH_ODYS_LOOX_PLUS) \
+    || defined(CONFIG_MACH_ODYS_NEXT)
+	.adc_vref			= 2500,				/* 2.500V Reference */
+#else
 	.adc_vref			= 3090,				/* 3.090V Reference */
+#endif
 	.adc_rset_high	 	= 200,				/* 200R Battery to ADC */
 	.adc_rset_low	 	= 200,				/* 200R ADC to GND */
 	.adc_raw_table_bat 	=					/* Values for 0..100% in steps of 10% */
@@ -1611,12 +2031,20 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
 		.irq            = RK29_PIN0_PA1,
 	},
 #endif
+#if defined(CONFIG_GS_MMA7660)
+	{
+		.type    		= "mma7660",
+		.addr           = 0x4c,
+		.flags			= 0,
+		.irq            = GSENSOR_INT_PIN,
+	},
+#endif
 #if defined (CONFIG_GS_MMA8452)
     {
       .type           = "gs_mma8452",
       .addr           = 0x1c,
       .flags          = 0,
-      .irq            = MMA8452_INT_PIN,
+      .irq            = GSENSOR_INT_PIN,
       .platform_data  = &mma8452_info,
     },
 #endif
@@ -1626,7 +2054,7 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
 	  .type 		  = "gs_mma8452",
 	  .addr 		  = 0x1d,
 	  .flags		  = 0,
-	  .irq			  = MMA8452_INT_PIN,
+	  .irq			  = GSENSOR_INT_PIN,
 	  .platform_data  = &mma8452_info,
 	},
 #endif
