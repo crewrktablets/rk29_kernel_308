@@ -115,7 +115,7 @@ volatile struct adc_point gADPoint;
 #define SampTimes_100u 		0x05
 #define SampTimes_200u 		0x06
 #define SampTimes_500u 		0x07
-#define SampTimes_Value     SampTimes_500u
+#define SampTimes_Value     SampTimes_50u
 
 #define SeqMode_XYZ_Scan 		0x00
 #define SeqMode_XY_Scan 		0x10
@@ -336,7 +336,7 @@ static s8 lz300msf_GetLimits(struct i2c_client *client, s16 *xlimits, s16 *ylimi
     // wait for ADC conversion to be finished
     for (i = 10, status = 1; i && status != 0; i--)
     {
-      udelay(2 << SampTimes_Value);
+      udelay(0x20 << SampTimes_Value);
       LZ300MSF_IICRead(REG_Status, &status, 1);
     }
     LZ300MSF_IICRead(REG_SeqData_Start, icdata, 2);
@@ -355,7 +355,7 @@ static s8 lz300msf_GetLimits(struct i2c_client *client, s16 *xlimits, s16 *ylimi
     // wait for ADC conversion to be finished
     for (i = 10, status = 1; i && status != 0; i--)
     {
-      udelay(2 << SampTimes_Value);
+      udelay(0x20 << SampTimes_Value);
       LZ300MSF_IICRead(REG_Status, &status, 1);
     }
     LZ300MSF_IICRead(REG_SeqData_Start, icdata, 2);
@@ -441,43 +441,39 @@ static s16 lz300msf_read_adc(struct i2c_client *client, s16 *pAdcArr)
   u8 i;
   u8 j;
 
-  // loop max 5x until valid reading is received
-  for (j = 5; ((z1 < Tth) || (z2 < z1)) && j; j--)
+  // send ADC request (All channels)
+  LZ300MSF_IICWrite(REG_SequenceCmd,
+                    SeqMode_All_Scan | SampTimes_Value | ADConver_6_Times);
+  // wait for ADC conversion to be finished
+  for (i = 10, status[0] = 1; i && status[0] != 0; i--)
   {
-    // send ADC request (All channels)
-    LZ300MSF_IICWrite(REG_SequenceCmd,
-                      SeqMode_All_Scan | SampTimes_Value | ADConver_6_Times);
-    // wait for ADC conversion to be finished
-    for (i = 10, status[0] = 1; i && status[0] != 0; i--)
-    {
-      udelay(2 << SampTimes_Value);
-      LZ300MSF_IICRead(REG_Status, status, 1);
-    }
-    // now read ADC values
-    LZ300MSF_IICRead(REG_SeqData_X1, icdata, 12);
-
-    // dump raw I2C values
-    DBG("LZ300-I2C=%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x (%02x)\n",
-        icdata[0], icdata[1], icdata[2], icdata[3], icdata[4], icdata[5],
-        icdata[6], icdata[7], icdata[8], icdata[9], icdata[10], icdata[11], i);
-
-    // convert i2c values to uint16
-    for (i = 0; i < 6; i++)
-    {
-      pAdcArr[i] = icdata[i * 2] << 4 | icdata[i * 2 + 1] >> 4;
-    }
-
-    // store to "sensible var names"
-    x_temp = pAdcArr[0];
-    z1 = pAdcArr[2];
-    z2 = pAdcArr[3];
-    dx = pAdcArr[4];
-    dy = pAdcArr[5];
-
-    // find max limits for x2,y2 (since they reference to high value)
-    if (dx > X_LIMITS) X_LIMITS = dx;
-    if (dy > Y_LIMITS) Y_LIMITS = dy;
+    udelay(0x20 << SampTimes_Value);
+    LZ300MSF_IICRead(REG_Status, status, 1);
   }
+  // now read ADC values
+  LZ300MSF_IICRead(REG_SeqData_X1, icdata, 12);
+
+  // dump raw I2C values
+  DBG("LZ300-I2C=%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x (%02x)\n",
+      icdata[0], icdata[1], icdata[2], icdata[3], icdata[4], icdata[5],
+      icdata[6], icdata[7], icdata[8], icdata[9], icdata[10], icdata[11], i);
+
+  // convert i2c values to uint16
+  for (i = 0; i < 6; i++)
+  {
+    pAdcArr[i] = icdata[i * 2] << 4 | icdata[i * 2 + 1] >> 4;
+  }
+
+  // store to "sensible var names"
+  x_temp = pAdcArr[0];
+  z1 = pAdcArr[2];
+  z2 = pAdcArr[3];
+  dx = pAdcArr[4];
+  dy = pAdcArr[5];
+
+  // find max limits for x2,y2 (since they reference to high value)
+  if (dx > X_LIMITS) X_LIMITS = dx;
+  if (dy > Y_LIMITS) Y_LIMITS = dy;
 
   /*
    * figure out the current touch mode
@@ -605,26 +601,18 @@ static int lz300msf_read_point(struct lz300msf *ts)
     ts->x = adcVal[0];
     ts->y = adcVal[1];
 
-    // if we have been dual touch before ...
-    if(ts->touchmode > ONE_TOUCH)
-    {
-      // ... report that second finger lifted
-      reportTouchPoint(ts, 1, ts->x, ts->y, 0);
-    }
     // report single touch point
     reportTouchPoint(ts, 0, ts->x, ts->y, z1);
+    // ... report second finger lifted
+    reportTouchPoint(ts, 1, ts->x, ts->y, 0);
     break;
 
   case ZERO_TOUCH:
   default:
-    // if we have been dual touch before ...
-    if(ts->touchmode > ONE_TOUCH)
-    {
-      // ... report that second finger lifted
-      reportTouchPoint(ts, 1, ts->x, ts->y, 0);
-    }
-    // report that second finger lifted
+    // report first finger lifted
     reportTouchPoint(ts, 0, ts->x, ts->y, 0);
+    // ... report second finger lifted
+    reportTouchPoint(ts, 1, ts->x, ts->y, 0);
     break;
   }
   // remember last touch mode
@@ -635,8 +623,8 @@ static int lz300msf_read_point(struct lz300msf *ts)
   // if touch ist still active ...
   if (touch_mode != ZERO_TOUCH)
   {
-    // queue next reading
-    queue_delayed_work(ts->wq, &ts->work, msecs_to_jiffies(70));
+    // queue next reading in 10ms
+    queue_delayed_work(ts->wq, &ts->work, msecs_to_jiffies(40));
   }
   else
   {
