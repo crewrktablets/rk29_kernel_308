@@ -492,7 +492,7 @@ static int tps65910_remove(struct i2c_client *client)
 	return 0;
 }
 
-static int __init
+static int
 tps65910_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int	 status;
