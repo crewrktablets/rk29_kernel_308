@@ -154,7 +154,7 @@ static int gt801_init_panel(struct gt801_ts_data *ts)
     return 0;
 }
 
-/** current status of every finger */
+/** current status of each finger */
 static int fingerStat[NUM_FINGERS];
 
 static void gt801_ts_work_func(struct work_struct *work)
@@ -166,7 +166,7 @@ static void gt801_ts_work_func(struct work_struct *work)
 	unsigned short x;
 	unsigned short y;
     unsigned short press;
-    int i, j, ret, needToReport;
+    int  ret, needToReport;
 
     struct gt801_ts_data *ts = container_of(work, struct gt801_ts_data, work);
 	
@@ -180,9 +180,12 @@ static void gt801_ts_work_func(struct work_struct *work)
 		
 		return;
     }
+
+#if GT801_DEBUG
 	/*
 	 * dump received data
 	 */
+    int i, j;
 	// loop through touch points
 	for(i=0; i<NUM_FINGERS; i++)
 	{
@@ -194,6 +197,7 @@ static void gt801_ts_work_func(struct work_struct *work)
       }
       gt801printk("\n");
 	}
+#endif
 
 	// calculate and report all reported touch events
     for(touchIdx=0; touchIdx<NUM_FINGERS;touchIdx++)
