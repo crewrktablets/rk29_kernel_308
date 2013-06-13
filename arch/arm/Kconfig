@@ -860,6 +860,7 @@ config ARCH_OMAP
 
 config ARCH_RK29
 	bool "Rockchip Soc Rk29"
+	select PLAT_RK
 	select CPU_V7
 	select HAVE_CLK
 	select CLKDEV_LOOKUP
@@ -1044,6 +1045,14 @@ config PLAT_ORION
 
 config PLAT_PXA
 	bool
+
+config PLAT_RK
+	bool
+	select CLKDEV_LOOKUP
+	select HAVE_SCHED_CLOCK
+	select ARCH_HAS_CPUFREQ
+	select GENERIC_CLOCKEVENTS
+	select ARCH_REQUIRE_GPIOLIB
 
 config PLAT_VERSATILE
 	bool
