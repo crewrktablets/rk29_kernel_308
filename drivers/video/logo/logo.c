@@ -96,6 +96,10 @@ const struct linux_logo * __init_refok fb_find_logo(int depth)
         /* Odys XPRESS logo */
         logo = &logo_xpress_clut224;
 #endif
+#ifdef CONFIG_LOGO_CRK29_CLUT224
+        /* CrewRkTablets Logo RK2918 */
+        logo = &logo_crk2918_clut224;
+#endif
 
 #ifdef CONFIG_LOGO_N90_CLUT224
 		/* Generic Linux logo */
