@@ -505,7 +505,7 @@ struct platform_device rk29_device_newton = {
 	};
 #endif
 
-#if defined (CONFIG_TOUCHSCREEN_FT5406)
+#if defined (CONFIG_TOUCHSCREEN_FT5406) || defined (CONFIG_TOUCHSCREEN_FT5x0x)
 #define TOUCH_RESET_PIN RK29_PIN6_PC3
 #define TOUCH_INT_PIN   RK29_PIN0_PA2
 int ft5406_init_platform_hw(void)
@@ -763,9 +763,9 @@ static struct gt801_platform_data gt801_info =
 {
     .model					= 801,
     .x_min                  = 0,
-    .x_max                  = 800,
+    .x_max                  = CONFIG_DISPLAY_WIDTH,
     .y_min                  = 0,
-    .y_max                  = 600,
+    .y_max                  = CONFIG_DISPLAY_HEIGHT,
     .options                = GT801_OPT_SWAP_XY
                              |GT801_OPT_INV_X
                              |GT801_OPT_INV_Y,
@@ -2195,7 +2195,7 @@ static struct i2c_board_info __initdata board_i2c2_devices[] = {
 		.platform_data	= &goodix_info,
     },
 #endif
-#if defined (CONFIG_TOUCHSCREEN_FT5406)
+#if defined (CONFIG_TOUCHSCREEN_FT5406) || defined (CONFIG_TOUCHSCREEN_FT5x0x)
     {
 		.type			="ft5x0x_ts",
 		.addr			= 0x38,    //0x70,
