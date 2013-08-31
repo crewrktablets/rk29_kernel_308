@@ -531,6 +531,9 @@ static void reportTouchPoint(struct lz300msf *ts, int id, int xAdc, int yAdc, in
   input_report_abs(ts->input, ABS_MT_TRACKING_ID, id);
   if(zAdc)
   {
+    gADPoint.x = xAdc;
+    gADPoint.y = yAdc;
+
     // calibrate ADC value to absolute screen coordinates
     TouchPanelCalibrateAPoint(xAdc, yAdc, &cal_x, &cal_y);
     cal_x /= 4;
