@@ -3060,7 +3060,7 @@ static struct v4l2_subdev_ops sensor_subdev_ops = {
 
 static struct i2c_client * g_i2c_client;
 static u32 cur_reg=0;
-static ssize_t ov2655_show(struct class *cls, char *_buf)
+static ssize_t ov2655_show(struct class *cls, struct class_attribute *attr, char *_buf)
 {
 	return printk("%s()\n", __FUNCTION__);
 }
@@ -3096,7 +3096,7 @@ static u32 strtol(const char *nptr, int base)
 	return ret;
 }
 
-static ssize_t ov2655_store(struct class *cls, const char *_buf, size_t _count)
+static ssize_t ov2655_store(struct class *cls, struct class_attribute *attr, const char *_buf, size_t _count)
 {
 	const char * p=_buf;
 	u16 reg;
