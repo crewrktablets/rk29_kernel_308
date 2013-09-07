@@ -63,7 +63,7 @@ int uncali_y_default[5] = { 3471, 3471, 482,   482, 1977 };
 int uncali_x[5] = { 0 };
 int uncali_y[5] = { 0 };
 
-static ssize_t touch_mode_show(struct class *cls, char *_buf)
+static ssize_t touch_mode_show(struct class *cls, struct class_attribute *attr, char *_buf)
 {
     int count;
     
@@ -79,12 +79,12 @@ static ssize_t touch_mode_show(struct class *cls, char *_buf)
 	return count;
 }
 
-static ssize_t touch_mode_store(struct class *cls, const char *_buf, size_t _count)
+static ssize_t touch_mode_store(struct class *cls, struct class_attribute *attr, const char *_buf, size_t _count)
 {
     int i, j = 0;
     char temp[5];
 
-    //printk("Read data from Android: %s\n", _buf);
+    printk("Read data from Android: %s\n", _buf);
     
     for (i = 0; i < 5; i++)
     {
@@ -100,14 +100,13 @@ static ssize_t touch_mode_store(struct class *cls, const char *_buf, size_t _cou
 }
 
 //This code is Touch adc simple value
-static ssize_t touch_adc_show(struct class *cls,char *_buf)
+static ssize_t touch_adc_show(struct class *cls, struct class_attribute *attr, char *_buf)
 {
     printk("ADC show: x=%d y=%d\n", gADPoint.x, gADPoint.y);
-    
 	return sprintf(_buf, "%d,%d\n", gADPoint.x, gADPoint.y);
 }
 
-static ssize_t touch_cali_status(struct class *cls, char *_buf)
+static ssize_t touch_cali_status(struct class *cls, struct class_attribute *attr, char *_buf)
 {
     int ret;
     

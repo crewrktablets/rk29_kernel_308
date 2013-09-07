@@ -70,4 +70,13 @@ config LCD_A050VL01
 	bool "RGB A050VL01"
 endchoice
 
-
+	config DISPLAY_WIDTH
+		int "Display width (pixel)"
+		default 800
+	    depends on DISPLAY_SUPPORT
+	
+	config DISPLAY_HEIGHT
+		int "Display height (pixel)"
+		default 600
+	    depends on DISPLAY_SUPPORT
+	

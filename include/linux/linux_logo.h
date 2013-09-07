@@ -39,6 +39,7 @@ extern const struct linux_logo logo_loox_clut224;
 extern const struct linux_logo logo_looxplus_clut224;
 extern const struct linux_logo logo_next_clut224;
 extern const struct linux_logo logo_xpress_clut224;
+extern const struct linux_logo logo_crk2918_clut224;
 extern const struct linux_logo logo_blackfin_vga16;
 extern const struct linux_logo logo_blackfin_clut224;
 extern const struct linux_logo logo_N90_clut224;

@@ -531,6 +531,9 @@ static void reportTouchPoint(struct lz300msf *ts, int id, int xAdc, int yAdc, in
   input_report_abs(ts->input, ABS_MT_TRACKING_ID, id);
   if(zAdc)
   {
+    gADPoint.x = xAdc;
+    gADPoint.y = yAdc;
+
     // calibrate ADC value to absolute screen coordinates
     TouchPanelCalibrateAPoint(xAdc, yAdc, &cal_x, &cal_y);
     cal_x /= 4;
@@ -874,6 +877,7 @@ static int lz300msf_probe(struct i2c_client *client, const struct i2c_device_id 
 
   input_dev->evbit[0] = BIT_MASK(EV_ABS);
   set_bit(EV_SYN, input_dev->evbit);
+  set_bit(INPUT_PROP_DIRECT, input_dev->propbit);
 
   /* register as multitouch device */
   input_set_abs_params(input_dev, ABS_X, 0, TP_SIZE_WID, 0, 0);
