@@ -877,6 +877,7 @@ static int lz300msf_probe(struct i2c_client *client, const struct i2c_device_id 
 
   input_dev->evbit[0] = BIT_MASK(EV_ABS);
   set_bit(EV_SYN, input_dev->evbit);
+  set_bit(INPUT_PROP_DIRECT, input_dev->propbit);
 
   /* register as multitouch device */
   input_set_abs_params(input_dev, ABS_X, 0, TP_SIZE_WID, 0, 0);
