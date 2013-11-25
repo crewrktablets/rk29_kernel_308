@@ -1287,8 +1287,8 @@ module_exit(btusb_exit);
 module_param(ignore_dga, bool, 0644);
 MODULE_PARM_DESC(ignore_dga, "Ignore devices with id 08fd:0001");
 
-module_param(ignore_csr, bool, 0644);
-MODULE_PARM_DESC(ignore_csr, "Ignore devices with id 0a12:0001");
+//module_param(ignore_csr, bool, 0644);
+//MODULE_PARM_DESC(ignore_csr, "Ignore devices with id 0a12:0001");
 
 module_param(ignore_sniffer, bool, 0644);
 MODULE_PARM_DESC(ignore_sniffer, "Ignore devices with id 0a12:0002");
