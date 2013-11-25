@@ -1228,7 +1228,7 @@ sensor_task_lock_err:
 }
 
 /* sensor register write */
-static int sensor_write(struct i2c_client *client, u8 reg, u8 val)
+static int sensor_write(struct i2c_client *client, u16 reg, u8 val)
 {
     int err,cnt;
     u8 buf[2];
@@ -1262,7 +1262,7 @@ static int sensor_write(struct i2c_client *client, u8 reg, u8 val)
 }
 
 /* sensor register read */
-static int sensor_read(struct i2c_client *client, u8 reg, u8 *val)
+static int sensor_read(struct i2c_client *client, u16 reg, u8 *val)
 {
     int err,cnt;
     u8 buf[1];
@@ -2673,7 +2673,7 @@ static struct v4l2_subdev_ops sensor_subdev_ops = {
 
 static struct i2c_client * g_i2c_client;
 static u32 cur_reg=0;
-static ssize_t ov7675_show(struct class *cls, char *_buf)
+static ssize_t ov7675_show(struct class *cls, struct class_attribute *attr, char *_buf)
 {
 	return printk("%s()\n", __FUNCTION__);
 }
@@ -2709,7 +2709,7 @@ static u32 strtol(const char *nptr, int base)
 	return ret;
 }
 
-static ssize_t ov7675_store(struct class *cls, const char *_buf, size_t _count)
+static ssize_t ov7675_store(struct class *cls, struct class_attribute *attr, const char *_buf, size_t _count)
 {
 	const char * p=_buf;
 	u16 reg;

@@ -465,6 +465,7 @@ static int gt801_ts_probe(struct i2c_client *client, const struct i2c_device_id 
 	ts->input_dev->dev.parent = &client->dev;
 
     ts->input_dev->evbit[0] = BIT_MASK(EV_SYN) | BIT_MASK(EV_ABS);
+    set_bit(INPUT_PROP_DIRECT, ts->input_dev->propbit);
   //  ts->input_dev->absbit[0] = 
 	//	BIT(ABS_MT_POSITION_X) | BIT(ABS_MT_POSITION_Y) | 
 	//	BIT(ABS_MT_TOUCH_MAJOR) | BIT(ABS_MT_WIDTH_MAJOR);  // for android

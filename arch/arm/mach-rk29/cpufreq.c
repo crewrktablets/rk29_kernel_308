@@ -31,11 +31,11 @@
 static int no_cpufreq_access;
 
 static struct cpufreq_frequency_table default_freq_table[] = {
-    { .index = 1200000, .frequency =   24000 }, // esh
+    // { .index = 1200000, .frequency =   24000 }, // esh
     { .index = 1200000, .frequency =  102000 }, // esh
     { .index = 1200000, .frequency =  204000 }, // esh
     { .index = 1200000, .frequency =  408000 },
-//  { .index = 1217000, .frequency =  624000 }, // esh
+    { .index = 1217000, .frequency =  624000 }, // esh
     { .index = 1270000, .frequency =  816000 },
     { .index = 1295000, .frequency =  912000 }, // esh
     { .index = 1300000, .frequency = 1008000 }, // esh

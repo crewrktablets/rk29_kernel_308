@@ -17,12 +17,12 @@
 /* Timing */
 #define H_PW			1
 #define H_BP			46
-#define H_VD			800
+#define H_VD			CONFIG_DISPLAY_WIDTH
 #define H_FP			210
 
 #define V_PW			3
 #define V_BP			23
-#define V_VD			600
+#define V_VD			CONFIG_DISPLAY_HEIGHT
 #define V_FP			12
 
 /* Other */
