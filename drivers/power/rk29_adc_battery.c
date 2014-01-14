@@ -1230,9 +1230,11 @@ static int rk29_adc_battery_probe(struct platform_device *pdev)
 
 	/* Setup timers for ADC and battery work queues. */
 	setup_timer(&data->timer, rk29_adc_battery_scan_timer, (unsigned long)data);
+#ifndef JB422_KERNEL
+	// In own CM10.1 Build we have a battery fix implemented that make this unnecessary and prevents battery to be shown
 	data->timer.expires = jiffies + 2000; /* First start delayed by 2s to finish init. */
 	add_timer(&data->timer);
-
+#endif
 	INIT_WORK(&data->timer_work, rk29_adc_battery_timer_work);
 	INIT_WORK(&data->resume_work, rk29_adc_battery_resume_check);
 

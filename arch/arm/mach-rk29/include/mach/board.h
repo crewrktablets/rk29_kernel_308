@@ -22,6 +22,8 @@
 #include <linux/timer.h>
 #include <linux/notifier.h>
 
+#define JB422_KERNEL
+
 #define TPS65910_HOST_IRQ                   RK29_PIN0_PA1 //test
 
 struct led_newton_pwm {
