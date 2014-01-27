@@ -183,10 +183,9 @@
 #endif
 
 #if 0	/* Disabled by Astralix: far too much? */
-#define PMEM_GPU_SIZE       (128 * SZ_1M)
-#define PMEM_UI_SIZE        ( 74 * SZ_1M) /* 1280x800: 64M 1024x768: 48M ... */
-#define PMEM_VPU_SIZE       SZ_64M
-#define PMEM_SKYPE_SIZE     0
+#define PMEM_GPU_SIZE       (128 * SZ_1M)	/* GPU: 128MB */
+#define PMEM_UI_SIZE        ( 74 * SZ_1M)	/* UI:  1280x800: 64M 1024x768: 48M ... */
+#define PMEM_VPU_SIZE       SZ_64M			/* VPU:  64MB */
 #define PMEM_CAM_SIZE       PMEM_CAM_NECESSARY
 
 #ifdef CONFIG_VIDEO_RK29_WORK_IPP
@@ -199,7 +198,6 @@
 
 #define PMEM_GPU_SIZE       SZ_64M
 #define PMEM_VPU_SIZE       SZ_64M
-#define PMEM_SKYPE_SIZE     0
 #define PMEM_CAM_SIZE       PMEM_CAM_NECESSARY
 
 #ifdef CONFIG_VIDEO_RK29_WORK_IPP
@@ -231,8 +229,7 @@
 #define MEM_CAMIPP_BASE     (PMEM_CAM_BASE - MEM_CAMIPP_SIZE)
 #define MEM_FB_BASE         (MEM_CAMIPP_BASE - MEM_FB_SIZE)
 #define MEM_FBIPP_BASE      (MEM_FB_BASE - MEM_FBIPP_SIZE)
-#define PMEM_SKYPE_BASE     (MEM_FBIPP_BASE - PMEM_SKYPE_SIZE)
-#define LINUX_SIZE          (PMEM_SKYPE_BASE - RK29_SDRAM_PHYS)
+#define LINUX_SIZE          (MEM_FBIPP_BASE - RK29_SDRAM_PHYS)
 
 #define PREALLOC_WLAN_SEC_NUM           4
 #define PREALLOC_WLAN_BUF_NUM           160
@@ -261,10 +258,10 @@ static int rk29_nand_io_init(void)
 }
 
 struct rk29_nand_platform_data rk29_nand_data = {
-    .width      = 1,     /* data bus width in bytes */
-    .hw_ecc     = 1,     /* hw ecc 0: soft ecc */
-    .num_flash    = 1,
-    .io_init   = rk29_nand_io_init,
+    .width		= 1,     /* data bus width in bytes */
+    .hw_ecc		= 1,     /* 1: hw ecc 0: soft ecc */
+    .num_flash	= 1,
+    .io_init	= rk29_nand_io_init,
 };
 
 #define TOUCH_SCREEN_STANDBY_PIN          RK29_PIN6_PD1
@@ -617,24 +614,6 @@ static struct platform_device rk29_vpu_mem_device = {
 	},
 };
 
-#if PMEM_SKYPE_SIZE > 0
-static struct android_pmem_platform_data android_pmem_skype_pdata = {
-	.name		= "pmem_skype",
-	.start		= PMEM_SKYPE_BASE,
-	.size		= PMEM_SKYPE_SIZE,
-	.no_allocator	= 0,
-	.cached		= 0,
-};
-
-static struct platform_device android_pmem_skype_device = {
-	.name		= "android_pmem",
-	.id		= 3,
-	.dev		= {
-		.platform_data = &android_pmem_skype_pdata,
-	},
-};
-#endif
-
 #ifdef CONFIG_ION
 static struct ion_platform_data rk29_ion_pdata = {
 	.nr = 1,
@@ -700,7 +679,7 @@ static struct mma8452_platform_data mma8452_info = {
  */
 struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
 		/* Copied configuration from Arnova M19 */
-	.dc_det_pin			= RK29_PIN4_PA1,
+	.dc_det_pin			= RK29_PIN4_PA1,	/* IN: Detect AC Charger */
 	.batt_low_pin		= RK29_PIN4_PA2,	/* IN: Hardware Bat Low Input */
 	.charge_set_pin		= INVALID_GPIO,		/* OUT: activate charge */
 	.charge_ok_pin		= RK29_PIN4_PA3,	/* IN: HIGH if charged 100% */
@@ -714,9 +693,11 @@ struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
 	.adc_rset_high	 	= 300,				/* 300R Battery to ADC */
 	.adc_rset_low	 	= 100,				/* 100R ADC to GND */
 	.adc_raw_table_bat 	=					/* Values for 0..100% in steps of 10% */
-		{ 6618, 6825, 6946, 7024, 7077, 7164, 7307, 7475, 7648, 7864, 8313},
+		// { 6618, 6825, 6946, 7024, 7077, 7164, 7307, 7475, 7648, 7864, 8313},
+		{ 7000, 7286, 7405, 7453, 7525, 7606, 7710, 7855, 7977, 8115, 8220 },
 	.adc_raw_table_ac 	=					/* Same again but while charging */
-		{ 6868, 7075, 7196, 7274, 7327, 7414, 7557, 7725, 7898, 8114, 8563},
+		// { 6868, 7075, 7196, 7274, 7327, 7414, 7557, 7725, 7898, 8114, 8563},
+		{ 7320, 7565, 7665, 7715, 7785, 7865, 7960, 8090, 8200, 8340, 8460 },
 	.adc_bat_levels		=
 		{ 8303,		/* 8.30V Maximum */
 		  6000, 	/* 6.00V zero cut-off voltage */
@@ -1453,7 +1434,7 @@ static int rk29_sdmmc0_cfg_gpio(void)
 #else
     rk29_sdmmc_set_iomux(0, 0xFFFF);
 
-	rk29_mux_api_set(GPIO2A2_SDMMC0DETECTN_NAME, GPIO2L_SDMMC0_DETECT_N);//Modifyed by xbw.
+	rk29_mux_api_set(GPIO2A2_SDMMC0DETECTN_NAME, GPIO2L_SDMMC0_DETECT_N); //Modifyed by xbw.
 
 	#if defined(CONFIG_SDMMC0_RK29_WRITE_PROTECT)
     gpio_request(SDMMC0_WRITE_PROTECT_PIN,"sdmmc-wp");
@@ -2016,9 +1997,6 @@ static struct platform_device *devices[] __initdata = {
         &rk29_soc_camera_pdrv_1,
         #endif
  	&android_pmem_cam_device,
-#endif
-#if PMEM_SKYPE_SIZE > 0
-	&android_pmem_skype_device,
 #endif
 #ifdef CONFIG_ION
 	&rk29_ion_device,

@@ -183,7 +183,6 @@
 #define PMEM_GPU_SIZE       SZ_32M// SZ_64M
 #define PMEM_UI_SIZE        SZ_32M
 #define PMEM_VPU_SIZE       SZ_64M
-#define PMEM_SKYPE_SIZE     0
 #define PMEM_CAM_SIZE       PMEM_CAM_NECESSARY
 #ifdef CONFIG_VIDEO_RK29_WORK_IPP
 #define MEM_CAMIPP_SIZE     SZ_4M
@@ -209,8 +208,7 @@
 #define MEM_CAMIPP_BASE     (PMEM_CAM_BASE - MEM_CAMIPP_SIZE)
 #define MEM_FB_BASE         (MEM_CAMIPP_BASE - MEM_FB_SIZE)
 #define MEM_FBIPP_BASE      (MEM_FB_BASE - MEM_FBIPP_SIZE)
-#define PMEM_SKYPE_BASE     (MEM_FBIPP_BASE - PMEM_SKYPE_SIZE)
-#define LINUX_SIZE          (PMEM_SKYPE_BASE - RK29_SDRAM_PHYS)
+#define LINUX_SIZE          (MEM_FBIPP_BASE - RK29_SDRAM_PHYS)
 
 #define PREALLOC_WLAN_SEC_NUM           4
 #define PREALLOC_WLAN_BUF_NUM           160
@@ -893,24 +891,6 @@ static struct platform_device rk29_vpu_mem_device = {
 	.platform_data = &vpu_mem_pdata,
 	},
 };
-
-#if PMEM_SKYPE_SIZE > 0
-static struct android_pmem_platform_data android_pmem_skype_pdata = {
-	.name		= "pmem_skype",
-	.start		= PMEM_SKYPE_BASE,
-	.size		= PMEM_SKYPE_SIZE,
-	.no_allocator	= 0,
-	.cached		= 0,
-};
-
-static struct platform_device android_pmem_skype_device = {
-	.name		= "android_pmem",
-	.id		= 3,
-	.dev		= {
-		.platform_data = &android_pmem_skype_pdata,
-	},
-};
-#endif
 
 #ifdef CONFIG_ION
 static struct ion_platform_data rk29_ion_pdata = {
@@ -3325,9 +3305,6 @@ static struct platform_device *devices[] __initdata = {
         &rk29_soc_camera_pdrv_1,
         #endif
  	&android_pmem_cam_device,
-#endif
-#if PMEM_SKYPE_SIZE > 0
-	&android_pmem_skype_device,
 #endif
 #ifdef CONFIG_ION
 	&rk29_ion_device,

@@ -22,19 +22,19 @@
 #include <linux/timer.h>
 #include <linux/notifier.h>
 
-#define JB422_KERNEL
-
-#define TPS65910_HOST_IRQ                   RK29_PIN0_PA1 //test
+// #define JB422_KERNEL
+/* AX: wtf should this thing in this file? */
+#define TPS65910_HOST_IRQ	RK29_PIN0_PA1 //test
 
 struct led_newton_pwm {
-	const char	*name;
+	const char		*name;
 	unsigned int	pwm_id;
 	unsigned	 	pwm_gpio;
 	char*			pwm_iomux_name;
 	unsigned int 	pwm_iomux_pwm;
 	unsigned int 	pwm_iomux_gpio;
-	unsigned int	freq;/**/
-	unsigned int	period;/*1-100*/
+	unsigned int	freq;	/**/
+	unsigned int	period;	/*1-100*/
 };
 
 struct led_newton_pwm_platform_data {
@@ -48,6 +48,7 @@ struct hdmi_platform_data {
 	int (*io_init)(void);
 	int (*io_deinit)(void);
 };
+
 struct irda_info{
     u32 intr_pin;
     int (*iomux_init)(void);
