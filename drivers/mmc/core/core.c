@@ -1107,7 +1107,7 @@ static void mmc_power_up(struct mmc_host *host)
 	mmc_host_clk_release(host);
 }
 
-static void mmc_power_off(struct mmc_host *host)
+void mmc_power_off(struct mmc_host *host)
 {
 	mmc_host_clk_hold(host);
 
@@ -1227,8 +1227,7 @@ void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops)
 }
 
 /*
- * Remove the current bus handler from a host. Assumes that there are
- * no interesting cards left, so the bus is powered down.
+ * Remove the current bus handler from a host.
  */
 void mmc_detach_bus(struct mmc_host *host)
 {
@@ -1640,14 +1639,15 @@ EXPORT_SYMBOL(mmc_set_blocklen);
 
 static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 {
+	host->f_init = freq;
+
 #if defined(CONFIG_SDMMC_RK29) || !defined(CONFIG_SDMMC_RK29_OLD)   //Modifyed by xbw at 2011-11-17		
 	int err = 0;
 #endif
 
-	host->f_init = freq;
-
 #ifdef CONFIG_MMC_DEBUG
-	pr_info("%s: %s: trying to init card at %u Hz\n", mmc_hostname(host), __func__, host->f_init);
+	pr_info("%s: %s: trying to init card at %u Hz\n",
+		mmc_hostname(host), __func__, host->f_init);
 #endif
 	mmc_power_up(host);
 
@@ -1873,6 +1873,7 @@ void mmc_stop_host(struct mmc_host *host)
 
 		mmc_claim_host(host);
 		mmc_detach_bus(host);
+		mmc_power_off(host);
 		mmc_release_host(host);
 		mmc_bus_put(host);
 		return;
@@ -1998,10 +1999,12 @@ int mmc_suspend_host(struct mmc_host *host)
 				host->bus_ops->remove(host);
 			mmc_claim_host(host);
 			mmc_detach_bus(host);
+			mmc_power_off(host);
 			mmc_release_host(host);
 			host->pm_flags = 0;
 			err = 0;
 		}
+		flush_delayed_work(&host->disable);
 	}
 	mmc_bus_put(host);
 
@@ -2102,6 +2105,7 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 			host->bus_ops->remove(host);
 
 		mmc_detach_bus(host);
+		mmc_power_off(host);
 		mmc_release_host(host);
 		host->pm_flags = 0;
 		break;
