@@ -42,7 +42,6 @@ static int do_hw_write(struct snd_soc_codec *codec, unsigned int reg,
 	if (!snd_soc_codec_volatile_register(codec, reg) &&
 	    reg < codec->driver->reg_cache_size &&
 	    !codec->cache_bypass) {
-	 
 		ret = snd_soc_cache_write(codec, reg, value);
 		if (ret < 0)
 			return -1;
@@ -54,8 +53,6 @@ static int do_hw_write(struct snd_soc_codec *codec, unsigned int reg,
 	}
 
 	ret = codec->hw_write(codec->control_data, data, len);
-
-	
 	if (ret == len)
 		return 0;
 	if (ret < 0)
@@ -74,11 +71,11 @@ static unsigned int do_hw_read(struct snd_soc_codec *codec, unsigned int reg)
 	    codec->cache_bypass) {
 		if (codec->cache_only)
 			return -1;
-             
+
 		BUG_ON(!codec->hw_read);
 		return codec->hw_read(codec, reg);
 	}
-     
+
 	ret = snd_soc_cache_read(codec, reg, &val);
 	if (ret < 0)
 		return -1;
@@ -168,7 +165,6 @@ static unsigned int do_i2c_read(struct snd_soc_codec *codec,
 	xfer[0].flags = 0;
 	xfer[0].len = reglen;
 	xfer[0].buf = reg;
-	xfer[0].scl_rate = 100 * 1000;
 
 	/* Read data */
 	xfer[1].addr = client->addr;
