@@ -107,11 +107,11 @@ int videobuf_waiton(struct videobuf_queue *q, struct videobuf_buffer *vb,
 	if (intr)
 		ret = wait_event_interruptible(vb->done, is_state_active_or_queued(q, vb));
 	else
-		wait_event(vb->done, is_state_active_or_queued(q, vb));    
+		wait_event(vb->done, is_state_active_or_queued(q, vb));
 	/* Relock */
 	if (is_ext_locked)
-		mutex_lock(q->ext_lock);    
-    
+		mutex_lock(q->ext_lock);
+
 	return ret;
 }
 EXPORT_SYMBOL_GPL(videobuf_waiton);
@@ -723,7 +723,7 @@ int videobuf_dqbuf(struct videobuf_queue *q,
 
 	MAGIC_CHECK(q->int_ops->magic, MAGIC_QTYPE_OPS);
 
-	memset(b, 0, sizeof(*b));    
+	memset(b, 0, sizeof(*b));
 	videobuf_queue_lock(q);
 
 	retval = stream_next_buffer(q, &buf, nonblocking);

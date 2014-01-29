@@ -65,6 +65,15 @@ static int uvc_ioctl_ctrl_map(struct uvc_video_chain *chain,
 			goto done;
 		}
 
+		/* Prevent excessive memory consumption, as well as integer
+		 * overflows.
+		 */
+		if (xmap->menu_count == 0 ||
+		    xmap->menu_count > UVC_MAX_CONTROL_MENU_ENTRIES) {
+			ret = -EINVAL;
+			goto done;
+		}
+
 		size = xmap->menu_count * sizeof(*map->menu_info);
 		map->menu_info = kmalloc(size, GFP_KERNEL);
 		if (map->menu_info == NULL) {
@@ -295,10 +304,8 @@ static int uvc_v4l2_set_format(struct uvc_streaming *stream,
 	struct uvc_frame *frame;
 	int ret;
 
-	if (fmt->type != stream->type) {
-        printk("uvc_v4l2_set_format, fmt->type(%d) != stream->type(%d)\n",fmt->type,stream->type);
+	if (fmt->type != stream->type)
 		return -EINVAL;
-	}
 
 	ret = uvc_v4l2_try_format(stream, fmt, &probe, &format, &frame);
 	if (ret < 0)
@@ -307,7 +314,6 @@ static int uvc_v4l2_set_format(struct uvc_streaming *stream,
 	mutex_lock(&stream->mutex);
 
 	if (uvc_queue_allocated(&stream->queue)) {
-        printk("uvc_queue_allocated failed\n");
 		ret = -EBUSY;
 		goto done;
 	}
@@ -704,7 +710,7 @@ static long uvc_v4l2_do_ioctl(struct file *file, unsigned int cmd, void *arg)
 					break;
 			}
 			pin = iterm->id;
-		} else if (pin < selector->bNrInPins) {
+		} else if (index < selector->bNrInPins) {
 			pin = selector->baSourceID[index];
 			list_for_each_entry(iterm, &chain->entities, chain) {
 				if (!UVC_ENTITY_IS_ITERM(iterm))
@@ -802,10 +808,8 @@ static long uvc_v4l2_do_ioctl(struct file *file, unsigned int cmd, void *arg)
 	}
 
 	case VIDIOC_S_FMT:
-		if ((ret = uvc_acquire_privileges(handle)) < 0) {
-            printk("uvc_acquire_privileges error.");
+		if ((ret = uvc_acquire_privileges(handle)) < 0)
 			return ret;
-		}
 
 		return uvc_v4l2_set_format(stream, arg);
 
@@ -979,18 +983,14 @@ static long uvc_v4l2_do_ioctl(struct file *file, unsigned int cmd, void *arg)
 	}
 
 	case VIDIOC_QBUF:
-		if (!uvc_has_privileges(handle)) {
-            printk("uvcvideo: VIDIOC_QBUF uvc_has_privileges failed\n");
+		if (!uvc_has_privileges(handle))
 			return -EBUSY;
-		}
 
 		return uvc_queue_buffer(&stream->queue, arg);
 
 	case VIDIOC_DQBUF:
-		if (!uvc_has_privileges(handle)) {
-            printk("uvcvideo: VIDIOC_DQBUF uvc_has_privileges failed\n");
+		if (!uvc_has_privileges(handle))
 			return -EBUSY;
-		}
 
 		return uvc_dequeue_buffer(&stream->queue, arg,
 			file->f_flags & O_NONBLOCK);

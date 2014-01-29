@@ -200,6 +200,7 @@ struct uvc_xu_control {
 
 /* Maximum allowed number of control mappings per device */
 #define UVC_MAX_CONTROL_MAPPINGS	1024
+#define UVC_MAX_CONTROL_MENU_ENTRIES	32
 
 /* Devices quirks */
 #define UVC_QUIRK_STATUS_INTERVAL	0x00000001
@@ -434,11 +435,8 @@ struct uvc_video_queue {
 	struct mutex mutex;	/* protects buffers and mainqueue */
 	spinlock_t irqlock;	/* protects irqqueue */
 
-    wait_queue_head_t wait; /* wait if mainqueue is empty */
-
 	struct list_head mainqueue;
 	struct list_head irqqueue;
-    
 };
 
 struct uvc_video_chain {
@@ -644,7 +642,7 @@ extern void uvc_mc_cleanup_entity(struct uvc_entity *entity);
 /* Video */
 extern int uvc_video_init(struct uvc_streaming *stream);
 extern int uvc_video_suspend(struct uvc_streaming *stream);
-extern int uvc_video_resume(struct uvc_streaming *stream);
+extern int uvc_video_resume(struct uvc_streaming *stream, int reset);
 extern int uvc_video_enable(struct uvc_streaming *stream, int enable);
 extern int uvc_probe_video(struct uvc_streaming *stream,
 		struct uvc_streaming_control *probe);
