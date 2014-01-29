@@ -103,8 +103,14 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 		 * chips may hold it low ("clock stretching") while they
 		 * are processing data internally.
 		 */
-		if (time_after(jiffies, start + adap->timeout))
+		if (time_after(jiffies, start + adap->timeout)) {
+			/* Test one last time, as we may have been preempted
+			 * between last check and timeout test.
+			 */
+			if (getscl(adap))
+				break;
 			return -ETIMEDOUT;
+		}
 		cond_resched();
 	}
 #ifdef DEBUG
@@ -378,7 +384,7 @@ static int sendbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 		 * the SMBus PEC was wrong.
 		 */
 		} else if (retval == 0) {
-			dev_err(&i2c_adap->dev, "sendbytes: NAK bailout, addr is 0x%x.\n", msg->addr);
+			dev_err(&i2c_adap->dev, "sendbytes: NAK bailout.\n");
 			return -EIO;
 
 		/* Timeout; or (someday) lost arbitration
@@ -389,8 +395,8 @@ static int sendbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 		 * to know or care about this ... it is *NOT* an error.
 		 */
 		} else {
-			dev_err(&i2c_adap->dev, "sendbytes: error %d, addr is 0x%x.\n",
-					retval, msg->addr);
+			dev_err(&i2c_adap->dev, "sendbytes: error %d\n",
+					retval);
 			return retval;
 		}
 	}
@@ -486,7 +492,7 @@ static int bit_doAddress(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 
 	if (flags & I2C_M_TEN) {
 		/* a ten bit address */
-		addr = 0xf0 | ((msg->addr >> 7) & 0x03);
+		addr = 0xf0 | ((msg->addr >> 7) & 0x06);
 		bit_dbg(2, &i2c_adap->dev, "addr0: %d\n", addr);
 		/* try extended address code...*/
 		ret = try_address(i2c_adap, addr, retries);
@@ -496,7 +502,7 @@ static int bit_doAddress(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 			return -EREMOTEIO;
 		}
 		/* the remaining 8 bit address */
-		ret = i2c_outb(i2c_adap, msg->addr & 0x7f);
+		ret = i2c_outb(i2c_adap, msg->addr & 0xff);
 		if ((ret != 1) && !nak_ok) {
 			/* the chip did not ack / xmission error occurred */
 			dev_err(&i2c_adap->dev, "died at 2nd address code\n");
@@ -544,7 +550,6 @@ static int bit_xfer(struct i2c_adapter *i2c_adap,
 	}
 
 	bit_dbg(3, &i2c_adap->dev, "emitting start condition\n");
-	adap->udelay = 500 * 1000/msgs[0].scl_rate + 1;
 	i2c_start(adap);
 	for (i = 0; i < num; i++) {
 		pmsg = &msgs[i];
