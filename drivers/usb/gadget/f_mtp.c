@@ -781,7 +781,7 @@ static void receive_file_work(struct work_struct *data)
 		if (read_req) {
 			/* wait for our last read to complete */
 			ret = wait_event_interruptible(dev->read_wq,
-				dev->rx_done || dev->state != STATE_BUSY);
+				dev->rx_done || (dev->state != STATE_BUSY));
 			if (dev->state == STATE_CANCELED) {
 				r = -ECANCELED;
 				if (!dev->rx_done)
@@ -797,6 +797,10 @@ static void receive_file_work(struct work_struct *data)
 				/* short packet is used to signal EOF for sizes > 4 gig */
 				DBG(cdev, "got short packet\n");
 				count = 0;
+				/* yk@20120509 usb disconnect will couse short packet, 
+				 * and dev state change to STATE_OFFLINE */
+                if(dev->state != STATE_BUSY)
+                    r = -EIO;
 			}
 
 			write_req = read_req;
@@ -846,13 +850,13 @@ static long mtp_ioctl(struct file *fp, unsigned code, unsigned long value)
 	struct file *filp = NULL;
 	int ret = -EINVAL;
 
+	if (mtp_lock(&dev->ioctl_excl))
+		return -EBUSY;
 
 	switch (code) {
 	case MTP_SEND_FILE:
 	case MTP_RECEIVE_FILE:
-    case MTP_SEND_FILE_WITH_HEADER:
-        if (mtp_lock(&dev->ioctl_opt_excl))
-            return -EBUSY;
+	case MTP_SEND_FILE_WITH_HEADER:
 	{
 		struct mtp_file_range	mfr;
 		struct work_struct *work;
@@ -919,10 +923,6 @@ static long mtp_ioctl(struct file *fp, unsigned code, unsigned long value)
 	case MTP_SEND_EVENT:
 	{
 		struct mtp_event	event;
-
-        if (mtp_lock(&dev->ioctl_event_excl))
-            return -EBUSY;
-
 		/* return here so we don't change dev->state below,
 		 * which would interfere with bulk transfer state.
 		 */
@@ -942,11 +942,7 @@ fail:
 		dev->state = STATE_READY;
 	spin_unlock_irq(&dev->lock);
 out:
-    if (MTP_SEND_EVENT == code)
-        mtp_unlock(&dev->ioctl_event_excl);
-    else
-        mtp_unlock(&dev->ioctl_opt_excl);
-
+	mtp_unlock(&dev->ioctl_excl);
 	DBG(dev->cdev, "ioctl returning %d\n", ret);
 	return ret;
 }
@@ -1162,6 +1158,8 @@ static int mtp_function_set_alt(struct usb_function *f,
 		return ret;
 	}
 	dev->state = STATE_READY;
+	
+	atomic_set(&dev->open_excl, 0); // solve open_excl lock problem, add by Huweiguo
 
 	/* readers may be blocked waiting for us to go online */
 	wake_up(&dev->read_wq);
@@ -1233,8 +1231,7 @@ static int mtp_setup(void)
 	init_waitqueue_head(&dev->write_wq);
 	init_waitqueue_head(&dev->intr_wq);
 	atomic_set(&dev->open_excl, 0);
-	atomic_set(&dev->ioctl_opt_excl, 0);
-	atomic_set(&dev->ioctl_event_excl, 0);
+	atomic_set(&dev->ioctl_excl, 0);
 	INIT_LIST_HEAD(&dev->tx_idle);
 	INIT_LIST_HEAD(&dev->intr_idle);
 

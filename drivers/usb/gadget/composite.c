@@ -72,7 +72,7 @@ module_param(iSerialNumber, charp, 0);
 MODULE_PARM_DESC(iSerialNumber, "SerialNumber string");
 
 static char composite_manufacturer[50];
-
+static int gadget_connected = 0;
 /*-------------------------------------------------------------------------*/
 
 /**
@@ -420,6 +420,9 @@ static int set_config(struct usb_composite_dev *cdev,
 		goto done;
 
 	cdev->config = c;
+	
+	/* reset delay status to zero every time usb reconnect */
+	cdev->delayed_status = 0;
 
 	/* Initialize all interfaces by setting them to altsetting zero. */
 	for (tmp = 0; tmp < MAX_CONFIG_INTERFACES; tmp++) {
@@ -474,6 +477,9 @@ static int set_config(struct usb_composite_dev *cdev,
 
 	/* when we return, be sure our power usage is valid */
 	power = c->bMaxPower ? (2 * c->bMaxPower) : CONFIG_USB_GADGET_VBUS_DRAW;
+
+	/* usb gadget connect flag */
+	gadget_connected = 1;
 done:
 	usb_gadget_vbus_draw(gadget, power);
 
@@ -565,7 +571,7 @@ done:
 	return status;
 }
 
-static int remove_config(struct usb_composite_dev *cdev,
+static int unbind_config(struct usb_composite_dev *cdev,
 			      struct usb_configuration *config)
 {
 	while (!list_empty(&config->functions)) {
@@ -580,7 +586,6 @@ static int remove_config(struct usb_composite_dev *cdev,
 			/* may free memory for "f" */
 		}
 	}
-	list_del(&config->list);
 	if (config->unbind) {
 		DBG(cdev, "unbind config '%s'/%p\n", config->label, config);
 		config->unbind(config);
@@ -599,9 +604,11 @@ int usb_remove_config(struct usb_composite_dev *cdev,
 	if (cdev->config == config)
 		reset_config(cdev);
 
+	list_del(&config->list);
+
 	spin_unlock_irqrestore(&cdev->lock, flags);
 
-	return remove_config(cdev, config);
+	return unbind_config(cdev, config);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1052,10 +1059,17 @@ static void composite_disconnect(struct usb_gadget *gadget)
 		reset_config(cdev);
 	if (composite->disconnect)
 		composite->disconnect(cdev);
+	/* usb gadget connect flag */
+	gadget_connected = 0;
 	spin_unlock_irqrestore(&cdev->lock, flags);
 }
 
 /*-------------------------------------------------------------------------*/
+int get_gadget_connect_flag( void )
+{
+    return gadget_connected;
+}
+EXPORT_SYMBOL(get_gadget_connect_flag);
 
 static ssize_t composite_show_suspended(struct device *dev,
 					struct device_attribute *attr,
@@ -1085,7 +1099,8 @@ composite_unbind(struct usb_gadget *gadget)
 		struct usb_configuration	*c;
 		c = list_first_entry(&cdev->configs,
 				struct usb_configuration, list);
-		remove_config(cdev, c);
+		list_del(&c->list);
+		unbind_config(cdev, c);
 	}
 	if (composite->unbind)
 		composite->unbind(cdev);
@@ -1367,6 +1382,9 @@ void usb_composite_setup_continue(struct usb_composite_dev *cdev)
 			req->status = 0;
 			composite_setup_complete(cdev->gadget->ep0, req);
 		}
+	}
+	else{
+	    WARN(cdev, "%s: Unexpected delayed status 0x%x\n", __func__, cdev->delayed_status);
 	}
 
 	spin_unlock_irqrestore(&cdev->lock, flags);

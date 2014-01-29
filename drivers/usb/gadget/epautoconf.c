@@ -112,6 +112,10 @@ ep_matches (
 					return 0;
 			}
 		} else {
+#ifdef CONFIG_ARCH_RK29
+    		if (USB_ENDPOINT_XFER_INT == type)
+    		    return 0;
+#endif    		    
 			tmp = ep->name + strlen (ep->name);
 		}
 
