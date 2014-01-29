@@ -61,6 +61,9 @@ static struct usb_device_id btusb_table[] = {
 	/* Generic Bluetooth USB device */
 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
 
+	/* Apple-specific (Broadcom) devices */
+	{ USB_VENDOR_AND_INTERFACE_INFO(0x05ac, 0xff, 0x01, 0x01) },
+
 	/* Broadcom SoftSailing reporting vendor specific */
 	{ USB_DEVICE(0x0a5c, 0x21e1) },
 
@@ -103,16 +106,13 @@ static struct usb_device_id btusb_table[] = {
 
 	/* Broadcom BCM20702A0 */
 	{ USB_DEVICE(0x0489, 0xe042) },
-	{ USB_DEVICE(0x0a5c, 0x21e1) },
-	{ USB_DEVICE(0x0a5c, 0x21e3) },
-	{ USB_DEVICE(0x0a5c, 0x21e6) },
-	{ USB_DEVICE(0x0a5c, 0x21e8) },
-	{ USB_DEVICE(0x0a5c, 0x21f3) },
-	{ USB_DEVICE(0x0a5c, 0x21f4) },
 	{ USB_DEVICE(0x413c, 0x8197) },
 
 	/* Foxconn - Hon Hai */
 	{ USB_DEVICE(0x0489, 0xe033) },
+
+	/*Broadcom devices with vendor specific id */
+	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
 
 	{ }	/* Terminating entry */
 };
@@ -131,17 +131,18 @@ static struct usb_device_id blacklist_table[] = {
 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
 	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+	{ USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
 
 	/* Atheros AR9285 Malbec with sflash firmware */
 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
 
 	/* Atheros 3012 with sflash firmware */
+	{ USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+	{ USB_DEVICE(0x0cf3, 0x817a), .driver_info = BTUSB_ATH3012 },
 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
 
 	/* Atheros AR5BBU12 with sflash firmware */
 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
@@ -715,54 +716,34 @@ static int btusb_send_frame(struct sk_buff *skb)
 			return -ENOMEM;
 		}
 
-        dr->bRequestType = data->cmdreq_type;
-        dr->bRequest     = 0;
-        dr->wIndex       = 0;
-        dr->wValue       = 0;
-        dr->wLength      = __cpu_to_le16(skb->len);
-
-	    buffer=kmalloc(skb->len,GFP_ATOMIC);
-	    if(buffer==NULL)
-        {
-			usb_free_urb(urb);
-			kfree(dr);
-            return -ENOMEM;
-        }
-	    memcpy(buffer,skb->data,skb->len);
+		dr->bRequestType = data->cmdreq_type;
+		dr->bRequest     = 0;
+		dr->wIndex       = 0;
+		dr->wValue       = 0;
+		dr->wLength      = __cpu_to_le16(skb->len);
 
 		pipe = usb_sndctrlpipe(data->udev, 0x00);
 
 		usb_fill_control_urb(urb, data->udev, pipe, (void *) dr,
-				buffer, skb->len, btusb_tx_complete, skb);
-        // mark urb to free transfer buffer on urb destroy
-        urb->transfer_flags |= URB_FREE_BUFFER;
+				skb->data, skb->len, btusb_tx_complete, skb);
 
 		hdev->stat.cmd_tx++;
 		break;
 
 	case HCI_ACLDATA_PKT:
-		if (!data->bulk_tx_ep)
+		if (!data->bulk_tx_ep || (hdev->conn_hash.acl_num < 1 &&
+						hdev->conn_hash.le_num < 1))
 			return -ENODEV;
 
 		urb = usb_alloc_urb(0, GFP_ATOMIC);
 		if (!urb)
 			return -ENOMEM;
 
-        buffer=kmalloc(skb->len,GFP_ATOMIC);
-        if(buffer==NULL)
-        {
-            usb_free_urb(urb);
-            return -ENOMEM;
-        }
-        memcpy(buffer,skb->data,skb->len);
-
 		pipe = usb_sndbulkpipe(data->udev,
 					data->bulk_tx_ep->bEndpointAddress);
 
 		usb_fill_bulk_urb(urb, data->udev, pipe,
-				buffer, skb->len, btusb_tx_complete, skb);
-        // mark urb to free transfer buffer on urb destroy
-        urb->transfer_flags |= URB_FREE_BUFFER;
+				skb->data, skb->len, btusb_tx_complete, skb);
 
 		hdev->stat.acl_tx++;
 		break;
@@ -775,23 +756,14 @@ static int btusb_send_frame(struct sk_buff *skb)
 		if (!urb)
 			return -ENOMEM;
 
-        buffer=kmalloc(skb->len,GFP_ATOMIC);
-        if(buffer==NULL)
-        {
-            usb_free_urb(urb);
-            return -ENOMEM;
-        }
-        memcpy(buffer,skb->data,skb->len);
-
 		pipe = usb_sndisocpipe(data->udev,
 					data->isoc_tx_ep->bEndpointAddress);
 
 		usb_fill_int_urb(urb, data->udev, pipe,
-				buffer, skb->len, btusb_isoc_tx_complete,
+				skb->data, skb->len, btusb_isoc_tx_complete,
 				skb, data->isoc_tx_ep->bInterval);
 
-        // mark urb urgent and to free transfer buffer on urb destroy
-		urb->transfer_flags |= (URB_ISO_ASAP | URB_FREE_BUFFER);
+		urb->transfer_flags  = URB_ISO_ASAP;
 
 		__fill_isoc_descriptor(urb, skb->len,
 				le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
@@ -800,7 +772,7 @@ static int btusb_send_frame(struct sk_buff *skb)
 		goto skip_waking;
 
 	default:
-	  return -EILSEQ;
+		return -EILSEQ;
 	}
 
 	err = inc_tx(data);
@@ -1167,7 +1139,7 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
 		return 0;
 
 	spin_lock_irq(&data->txlock);
-	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
+	if (!((message.event & PM_EVENT_AUTO) && data->tx_in_flight)) {
 		set_bit(BTUSB_SUSPENDING, &data->flags);
 		spin_unlock_irq(&data->txlock);
 	} else {
@@ -1287,8 +1259,8 @@ module_exit(btusb_exit);
 module_param(ignore_dga, bool, 0644);
 MODULE_PARM_DESC(ignore_dga, "Ignore devices with id 08fd:0001");
 
-//module_param(ignore_csr, bool, 0644);
-//MODULE_PARM_DESC(ignore_csr, "Ignore devices with id 0a12:0001");
+module_param(ignore_csr, bool, 0644);
+MODULE_PARM_DESC(ignore_csr, "Ignore devices with id 0a12:0001");
 
 module_param(ignore_sniffer, bool, 0644);
 MODULE_PARM_DESC(ignore_sniffer, "Ignore devices with id 0a12:0002");
