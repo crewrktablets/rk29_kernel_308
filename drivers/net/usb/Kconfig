@@ -233,7 +233,7 @@ config USB_NET_DM9620
 	  10/100 Ethernet adapters.
 
 config USB_NET_SR9700
-	tristate "WilLing Electrnic SR9700 based USB 2.0"
+	tristate "WilLing Electronic SR9700 based USB 2.0"
 	depends on USB_USBNET
 	select CRC32
 	default y

@@ -136,6 +136,7 @@ static void vmac_handle_link_change(struct net_device *dev)
 	struct phy_device *phydev = ap->phy_dev;
 	unsigned long flags;
 	int report_change = 0;
+	struct rk29_vmac_platform_data *pdata = ap->pdev->dev.platform_data;
 
 	spin_lock_irqsave(&ap->lock, flags);
 
@@ -159,6 +160,9 @@ static void vmac_handle_link_change(struct net_device *dev)
 		ap->speed = phydev->speed;
 		report_change = 1;
 	}
+
+	if (pdata && pdata->rmii_speed_switch)
+		pdata->rmii_speed_switch(phydev->speed);
 
 	if (phydev->link != ap->link) {
 		ap->link = phydev->link;
@@ -1044,8 +1048,16 @@ int vmac_open(struct net_device *dev)
 		
 	//set rmii ref clock 50MHz
 	mac_clk = clk_get(NULL, "mac_ref_div");
+	if (IS_ERR(mac_clk))
+		mac_clk = NULL;
 	arm_clk = clk_get(NULL, "arm_pll");
-	mac_parent = clk_get_parent(mac_clk);
+	if (IS_ERR(arm_clk))
+		arm_clk = NULL;
+	if (mac_clk) {
+		mac_parent = clk_get_parent(mac_clk);
+		if (IS_ERR(mac_parent))
+			mac_parent = NULL;
+	}
 	if (arm_clk && mac_parent && (arm_clk == mac_parent))
 		wake_lock(&idlelock);
 	
@@ -1184,8 +1196,16 @@ int vmac_close(struct net_device *dev)
 
 	//clock close
 	mac_clk = clk_get(NULL, "mac_ref_div");
-	mac_parent = clk_get_parent(mac_clk);	
+	if (IS_ERR(mac_clk))
+		mac_clk = NULL;
+	if (mac_clk) {
+		mac_parent = clk_get_parent(mac_clk);
+		if (IS_ERR(mac_parent))
+			mac_parent = NULL;
+	}
 	arm_clk = clk_get(NULL, "arm_pll");
+	if (IS_ERR(arm_clk))
+		arm_clk = NULL;
 
 	if (arm_clk && mac_parent && (arm_clk == mac_parent))
 		wake_unlock(&idlelock);
@@ -1416,10 +1436,10 @@ static void vmac_set_multicast_list(struct net_device *dev)
 	spin_lock_irqsave(&ap->lock, flags);
 
 	promisc = !!(dev->flags & IFF_PROMISC);
-	reg = vmac_readl(ap, ENABLE);
+	reg = vmac_readl(ap, CONTROL);
 	if (promisc != !!(reg & PROM_MASK)) {
 		reg ^= PROM_MASK;
-		vmac_writel(ap, reg, ENABLE);
+		vmac_writel(ap, reg, CONTROL);
 	}
 
 	if (dev->flags & IFF_ALLMULTI)
